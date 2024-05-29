@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  web:
+    image: node:16
+    working_dir: /app
+    volumes:
+      - ./octopus:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:password@db:5432/mydb
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./pgdata/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=octopus
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

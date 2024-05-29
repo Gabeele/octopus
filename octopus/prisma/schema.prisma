@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int                 @id @default(autoincrement())
+  username    String              @unique
+  password    String
+  pin         String?
+  firstName   String
+  lastName    String
+  phoneNumber String?
+  isAdmin     Boolean             @default(false)
+  dailyCashFlows DailyCashFlow[]
+  timeCards   TimeCard[]
+  vacationRequests VacationRequest[]
+  notifications Notification[]
+}
+
+model DailyCashFlow {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  user          User      @relation(fields: [userId], references: [id])
+  coinsCount    Int
+  billsCount    Int
+  date          DateTime
+  disbursements Json
+  reimbursements Json
+}
+
+model TimeCard {
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  user     User      @relation(fields: [userId], references: [id])
+  clockIn  DateTime
+  clockOut DateTime?
+}
+
+model ProductWarranty {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  date      DateTime
+}
+
+model DamagedGood {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  date      DateTime
+}
+
+model Return {
+  id             Int      @id @default(autoincrement())
+  customerName   String
+  customerPhone  String
+  batteryDetails String
+  currentVoltage Float?
+  cca            Int?
+  customerType   String
+  batteryDate    DateTime?
+  status         String
+  returnDate     DateTime
+  notes          String?
+  isArchived     Boolean  @default(false)
+  archivedDate   DateTime?
+}
+
+model VacationRequest {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  status    String   @default("Pending")
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  adminId   Int
+  admin     User      @relation(fields: [adminId], references: [id])
+  message   String
+  createdAt DateTime  @default(now())
+  read      Boolean   @default(false)
+}
