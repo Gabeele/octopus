@@ -4,17 +4,16 @@ import Record from "./record";
 import fetchReturns from "./actions";
 import { useEffect, useState } from "react";
 
-function ReturnTable() {
+function ReturnTable({ showArchived }) {
     const [returns, setReturns] = useState([]);
 
     useEffect(() => {
         refresh();
-    }, []);
+    }, [showArchived]);
 
     async function refresh() {
-        const fetchedReturns = await fetchReturns();
+        const fetchedReturns = await fetchReturns(showArchived);
         setReturns(fetchedReturns);
-        console.log(returns)
     }
 
     return (
@@ -48,6 +47,7 @@ function ReturnTable() {
                             date={ret.date}
                             notes={ret.notes}
                             id={ret.id}
+                            isArchived={ret.isArchived}
                             refresh={refresh}
                         />
                     ))
@@ -60,7 +60,7 @@ function ReturnTable() {
                 )}
             </TableBody>
         </Table>
-    )
-};
+    );
+}
 
 export default ReturnTable;

@@ -19,13 +19,13 @@ import {
     Select,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import isArchive from './actions';
+import archiveReturn from './actions';
 
-function Record({ battery, name, phone, voltage, cca, type, status, date, notes, id, refresh }) {
+function Record({ battery, name, phone, voltage, cca, type, status, date, notes, id, isArchived, refresh }) {
     const [isArchiving, setIsArchiving] = useState(false);
 
     function handleArchive(id) {
-        isArchive(id);
+        archiveReturn(id);
     };
 
     return (
@@ -51,7 +51,7 @@ function Record({ battery, name, phone, voltage, cca, type, status, date, notes,
             <TableCell>{new Date(date).toLocaleDateString()}</TableCell>
             <TableCell>{notes}</TableCell>
             <TableCell className="text-right">
-                <Button size="icon" variant="outline" onclick={handleArchive(id)}>
+                <Button size="icon" variant="outline" onClick={handleArchive(id)}>
                     <PencilIcon className="h-4 w-4" />
                     <span className="sr-only">Archive</span>
                 </Button>

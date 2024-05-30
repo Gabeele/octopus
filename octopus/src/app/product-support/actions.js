@@ -1,7 +1,7 @@
 'use server';
 import prisma from "@/lib/prisma";
 
-export async function isArchive(id) {
+export const archiveReturn = async (id) => {
     try {
         const updatedReturn = await prisma.return.update({
             where: { id: id },
@@ -11,9 +11,9 @@ export async function isArchive(id) {
     } catch (error) {
         throw new Error(`Failed to archive return with id ${id}: ${error.message}`);
     }
-}
+};
 
-export async function newReturn(data) {
+export const newReturn = async (data) => {
     try {
         const createdReturn = await prisma.return.create({
             data: {
@@ -34,12 +34,14 @@ export async function newReturn(data) {
     } catch (error) {
         throw new Error(`Failed to create return: ${error.message}`);
     }
-}
+};
 
-export default async function fetchReturns() {
+export const fetchReturns = async (archivedVisible = false) => {
+    console.log(archivedVisible);
+
     const data = await prisma.return.findMany({
         where: {
-            isArchived: false,
+            isArchived: archivedVisible,
         },
         orderBy: {
             date: "desc",
@@ -47,3 +49,5 @@ export default async function fetchReturns() {
     });
     return data;
 };
+
+export default fetchReturns;
