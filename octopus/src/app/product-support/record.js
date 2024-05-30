@@ -21,7 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import isArchive from './actions';
 
-function Record({ battery, name, phone, voltage, cca, type, status, date, notes, id }) {
+function Record({ battery, name, phone, voltage, cca, type, status, date, notes, id, refresh }) {
     const [isArchiving, setIsArchiving] = useState(false);
 
     function handleArchive(id) {

@@ -22,7 +22,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { newReturn } from "./actions";
 
-const AddReturnModal = () => {
+function AddReturnModal(refresh) {
     const [battery, setBattery] = useState("");
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
@@ -49,6 +49,7 @@ const AddReturnModal = () => {
         };
         newReturn(data);
         setOpen(false);
+        refresh();
     }
 
     return (
