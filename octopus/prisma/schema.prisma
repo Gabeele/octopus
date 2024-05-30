@@ -55,15 +55,14 @@ model DamagedGood {
 
 model Return {
   id             Int      @id @default(autoincrement())
-  customerName   String
-  customerPhone  String
-  batteryDetails String
-  currentVoltage Float?
-  cca            Int?
-  customerType   String
-  batteryDate    DateTime?
+  name   String
+  phone  String?
+  battery String
+  voltage Float
+  cca            Int
+  type   String
+  date    DateTime?
   status         String
-  returnDate     DateTime
   notes          String?
   isArchived     Boolean  @default(false)
   archivedDate   DateTime?
