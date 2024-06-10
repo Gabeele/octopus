@@ -9,8 +9,9 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import getSupportProducts from './actions';
+import { getSupportProducts } from './action';
 import SupportRecord from './support_record';
+import Link from 'next/link';
 
 export default function SupportTable() {
     const [products, setProducts] = useState([]);
@@ -41,7 +42,8 @@ export default function SupportTable() {
                     <TableHead>Dropoff Date</TableHead>
                     <TableHead>Customer Type</TableHead>
                     <TableHead>Phone Number</TableHead>
-
+                    <TableHead>Comments</TableHead>
+                    <TableHead></TableHead>
                 </TableRow>
 
             </TableHeader>

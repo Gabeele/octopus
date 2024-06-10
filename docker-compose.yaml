@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   web:
-    image: node:16
+    image: node:latest
     working_dir: /app
     volumes:
       - ./octopus:/app

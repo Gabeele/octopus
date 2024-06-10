@@ -23,13 +23,13 @@ model ProductSupport {
   hasLoaner         Boolean?         @default(false)  // Optional field with default value
   isResolved        Boolean
   resolveDate       DateTime?        // Optional field
-  support_comments  SupportComments? @relation(fields: [support_comments_id], references: [id])
-  support_comments_id Int?
+  comments          SupportComments[]
 }
 
 model SupportComments {
-  id            Int              @id @default(autoincrement())
-  comment       String
-  comment_date  DateTime
-  productSupport ProductSupport[]
+  id                Int              @id @default(autoincrement())
+  comment           String
+  comment_date      DateTime
+  productSupportId  Int
+  productSupport    ProductSupport   @relation(fields: [productSupportId], references: [id])
 }
