@@ -37,11 +37,12 @@ export default function SupportTable() {
             <TableHeader>
                 <TableRow>
                     <TableHead>Customer Name</TableHead>
+                    <TableHead>Phone Number</TableHead>
                     <TableHead>Product</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead>Dropoff Date</TableHead>
                     <TableHead>Customer Type</TableHead>
-                    <TableHead>Phone Number</TableHead>
+                    <TableHead>Process</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Comments</TableHead>
                     <TableHead></TableHead>
                 </TableRow>

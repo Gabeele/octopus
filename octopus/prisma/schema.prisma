@@ -11,11 +11,11 @@ model ProductSupport {
   id                Int              @id @default(autoincrement())
   customer_name     String
   product           String
-  type              String
-  status            String
-  outcome           String?          // Optional field
-  dropoff_date      DateTime
-  isWholesale       Boolean
+  supportType       String              // Warranty Check, Recharge Check, Credit New, 
+  process           String              // Inspecting, Charging, Holding, Resolved (Changed when resolved is clicked)
+  status            String?             // Not Holding Charge, Dead Cell, Broken, Worn,  Good 
+  dropoff_date      DateTime            
+  isWholesale       Boolean             // Wholesale, Retail
   phone_number      String?          // Optional field
   age               String?          // Optional field
   cca               Int?             // Optional field
@@ -23,6 +23,7 @@ model ProductSupport {
   hasLoaner         Boolean?         @default(false)  // Optional field with default value
   isResolved        Boolean
   resolveDate       DateTime?        // Optional field
+  resolution        String?          // Credited, Warrantied, Returned, Scrapped, Refunded
   comments          SupportComments[]
 }
 

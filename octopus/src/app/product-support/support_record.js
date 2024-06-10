@@ -28,8 +28,8 @@ import {
     DialogFooter,
     DialogClose
 } from "@/components/ui/dialog"
+import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import next from 'next';
 
 export default function SupportRecord(product) {
     const [newComment, setNewComment] = useState('');
@@ -57,22 +57,37 @@ export default function SupportRecord(product) {
     return (
         <TableRow key={product.id}>
             <TableCell>{product.customer_name}</TableCell>
+            <TableCell>{product.phone_number || 'N/A'}</TableCell>
             <TableCell>{product.product}</TableCell>
+            <TableCell>{new Date(product.dropoff_date).toLocaleDateString()}</TableCell>
+            <TableCell>{product.isWholesale ? 'Wholesale' : 'Walk-in'}</TableCell>
             <TableCell>
-                <Select defaultValue={product.status} onValueChange={(newStatus) => handleStatusChange(newStatus, product.id)}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select status" />
+                <Select id="process" defaultValue={product.process}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select process" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Picked Up">Picked Up</SelectItem>
+                        <SelectItem value="Inspecting">Inspecting</SelectItem>
                         <SelectItem value="Charging">Charging</SelectItem>
                         <SelectItem value="Holding">Holding</SelectItem>
+                        <SelectItem value="Resolved">Resolved</SelectItem>
                     </SelectContent>
                 </Select>
             </TableCell>
-            <TableCell>{new Date(product.dropoff_date).toLocaleDateString()}</TableCell>
-            <TableCell>{product.isWholesale ? 'Wholesale' : 'Walk-in'}</TableCell>
-            <TableCell>{product.phone_number || 'N/A'}</TableCell>
+            <TableCell>
+                <Select defaultValue={product.status} onValueChange={(newStatus) => handleStatusChange(newStatus, product.id)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Broken">Broken</SelectItem>
+                        <SelectItem value="Dead Cell">Dead Cell</SelectItem>
+                        <SelectItem value="Worn">Worn</SelectItem>
+                        <SelectItem value="Not Holding Charge">Not Holding Charge</SelectItem>
+                        <SelectItem value="Good">Good</SelectItem>
+                    </SelectContent>
+                </Select>
+            </TableCell>
             <TableCell style={{ maxWidth: '200px', wordWrap: 'break-word' }}>
                 <HoverCard>
                     <HoverCardTrigger>
