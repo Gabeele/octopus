@@ -1,87 +1,26 @@
--- Create users table
-CREATE TABLE users (
+
+-- returns table
+CREATE TABLE product_support (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(50) NOT NULL UNIQUE,
-  password VARCHAR(50) NOT NULL,
-  pin VARCHAR(10),
-  first_name VARCHAR(50) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
-  phone_number VARCHAR(20),
-  is_admin BOOLEAN DEFAULT FALSE
+  customer_name VARCHAR(255) NOT NULL,
+  product VARCHAR(255) NOT NULL,
+  type VARCHAR(255) NOT NULL,         -- Type of return (New for credit, warranty check, recharge check)
+  status VARCHAR(255) NOT NULL,       -- Status of the return (Picked-up, charging, holding, returned, scrapped, credited)
+  outcome VARCHAR(255) NOT NULL,      -- Outcome of the return (Battery is good, battery is bad, battery is good but customer is bad)
+  dropoff_date DATE NOT NULL,       -- Date which the product was returned
+  isWholesale BOOLEAN NOT NULL,     -- True if the customer is a wholesaler, false if walkin
+  phone_number VARCHAR(255) NULL,
+  age VARCHAR(4) NULL, 
+  cca int NULL,
+  voltage float NULL,
+  hasLoaner BOOLEAN NOT NULL,       -- True if the customer has a loaner battery 
+  isResolved BOOLEAN NOT NULL,       -- True if the issue has been resolved
+  resolveDate DATE NULL,            -- Date the issue was resolved
+  FOREIGN KEY (support_comments_id) REFERENCES support_comments(id) NULL
 );
 
--- Create daily_cash_flows table
-CREATE TABLE daily_cash_flows (
+CREATE TABLE support_comments (
   id SERIAL PRIMARY KEY,
-  user_id INT REFERENCES users(id),
-  coins_count INT NOT NULL,
-  bills_count INT NOT NULL,
-  date TIMESTAMP NOT NULL,
-  disbursements JSONB NOT NULL,
-  reimbursements JSONB NOT NULL
+  comment TEXT NOT NULL,
+  comment_date DATE NOT NULL,
 );
-
--- Create time_cards table
-CREATE TABLE time_cards (
-  id SERIAL PRIMARY KEY,
-  user_id INT REFERENCES users(id),
-  clock_in TIMESTAMP NOT NULL,
-  clock_out TIMESTAMP
-);
-
--- Create product_warranty table
-CREATE TABLE product_warranty (
-  id SERIAL PRIMARY KEY,
-  product_id INT NOT NULL,
-  date DATE NOT NULL
-);
-
--- Create damaged_goods table
-CREATE TABLE damaged_goods (
-  id SERIAL PRIMARY KEY,
-  product_id INT NOT NULL,
-  date DATE NOT NULL
-);
-
--- Create returns table
-CREATE TABLE returns (
-  id SERIAL PRIMARY KEY,
-  customer_name VARCHAR(100) NOT NULL,
-  customer_phone VARCHAR(20) NOT NULL,
-  battery_details TEXT NOT NULL,
-  current_voltage DECIMAL(5, 2),
-  cca INT,
-  customer_type VARCHAR(20) NOT NULL,
-  battery_date DATE,
-  status VARCHAR(50) NOT NULL,
-  return_date DATE NOT NULL
-);
-
--- Create vacation_requests table
-CREATE TABLE vacation_requests (
-  id SERIAL PRIMARY KEY,
-  user_id INT REFERENCES users(id),
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  status VARCHAR(20) DEFAULT 'Pending'
-);
-
--- Create notifications table
-CREATE TABLE notifications (
-  id SERIAL PRIMARY KEY,
-  admin_id INT REFERENCES users(id),
-  message TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  read BOOLEAN DEFAULT FALSE
-);
-
--- Example Insertions
-INSERT INTO users (username, password, pin, first_name, last_name, phone_number, is_admin) VALUES ('admin', 'admin123', '1234', 'Admin', 'User', '555-0000', TRUE);
-INSERT INTO daily_cash_flows (user_id, coins_count, bills_count, date, disbursements, reimbursements) VALUES (1, 200, 500, '2024-05-26 08:00:00', '[{"id": 1, "description": "Refund", "amount": 100}]', '[{"id": 1, "description": "Reimbursement", "amount": 50}]');
-INSERT INTO time_cards (user_id, clock_in) VALUES (1, '2024-05-26 08:00:00');
-INSERT INTO product_warranty (product_id, date) VALUES (1, '2024-05-26');
-INSERT INTO damaged_goods (product_id, date) VALUES (1, '2024-05-26');
-INSERT INTO returns (customer_name, customer_phone, battery_details, current_voltage, cca, customer_type, battery_date, status, return_date) 
-VALUES ('John Doe', '555-1234', 'Car Battery, Model XYZ', 12.5, 750, 'Walk-in', '2024-01-15', 'Pending', '2024-05-26');
-INSERT INTO vacation_requests (user_id, start_date, end_date) VALUES (1, '2024-06-01', '2024-06-10');
-INSERT INTO notifications (admin_id, message) VALUES (1, 'New return request from John Doe.');

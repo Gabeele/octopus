@@ -1,87 +1,35 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          Int                 @id @default(autoincrement())
-  username    String              @unique
-  password    String
-  pin         String?
-  firstName   String
-  lastName    String
-  phoneNumber String?
-  isAdmin     Boolean             @default(false)
-  dailyCashFlows DailyCashFlow[]
-  timeCards   TimeCard[]
-  vacationRequests VacationRequest[]
-  notifications Notification[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model DailyCashFlow {
-  id            Int       @id @default(autoincrement())
-  userId        Int
-  user          User      @relation(fields: [userId], references: [id])
-  coinsCount    Int
-  billsCount    Int
-  date          DateTime
-  disbursements Json
-  reimbursements Json
+model ProductSupport {
+  id                Int              @id @default(autoincrement())
+  customer_name     String
+  product           String
+  type              String
+  status            String
+  outcome           String?          // Optional field
+  dropoff_date      DateTime
+  isWholesale       Boolean
+  phone_number      String?          // Optional field
+  age               String?          // Optional field
+  cca               Int?             // Optional field
+  voltage           Float?           // Optional field
+  hasLoaner         Boolean?         @default(false)  // Optional field with default value
+  isResolved        Boolean
+  resolveDate       DateTime?        // Optional field
+  support_comments  SupportComments? @relation(fields: [support_comments_id], references: [id])
+  support_comments_id Int?
 }
 
-model TimeCard {
-  id       Int       @id @default(autoincrement())
-  userId   Int
-  user     User      @relation(fields: [userId], references: [id])
-  clockIn  DateTime
-  clockOut DateTime?
-}
-
-model ProductWarranty {
-  id        Int      @id @default(autoincrement())
-  productId Int
-  date      DateTime
-}
-
-model DamagedGood {
-  id        Int      @id @default(autoincrement())
-  productId Int
-  date      DateTime
-}
-
-model Return {
-  id             Int      @id @default(autoincrement())
-  name   String
-  phone  String?
-  battery String
-  voltage Float
-  cca            Int
-  type   String
-  date    DateTime?
-  status         String
-  notes          String?
-  isArchived     Boolean  @default(false)
-  archivedDate   DateTime?
-}
-
-model VacationRequest {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  startDate DateTime
-  endDate   DateTime
-  status    String   @default("Pending")
-}
-
-model Notification {
-  id        Int       @id @default(autoincrement())
-  adminId   Int
-  admin     User      @relation(fields: [adminId], references: [id])
-  message   String
-  createdAt DateTime  @default(now())
-  read      Boolean   @default(false)
+model SupportComments {
+  id            Int              @id @default(autoincrement())
+  comment       String
+  comment_date  DateTime
+  productSupport ProductSupport[]
 }

@@ -1,20 +1,17 @@
 import { Button } from "@/components/ui/button";
-import SigninModal from "@/components/Signin-modal";
+
 
 export default function Home() {
-  const punchIn = () => {
-    console.log('Punch In');
-  };
+
 
   return (
     <main className="flex-1 bg-gray-100 dark:bg-gray-800 p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">
+      {/* <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">
         <ClockIcon className="w-12 h-12 text-primary" />
         <h3 className="text-xl font-bold mt-4">Punch In</h3>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
           Clock in for the day
         </p>
-        <SigninModal buttonTrigger="Punch In" />
       </div>
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">
         <ClockIcon className="w-12 h-12 text-primary" />
@@ -32,6 +29,7 @@ export default function Home() {
         </p>
         <Button className="mt-4">Cash Flow</Button>
       </div>
+      */}
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">
         <BoxIcon className="w-12 h-12 text-primary" />
         <h3 className="text-xl font-bold mt-4">New Return</h3>
@@ -40,6 +38,7 @@ export default function Home() {
         </p>
         <Button className="mt-4">New Return</Button>
       </div>
+      {/*
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">
         <WrenchIcon className="w-12 h-12 text-primary" />
         <h3 className="text-xl font-bold mt-4">Warranty</h3>
@@ -55,7 +54,7 @@ export default function Home() {
           Report a damaged product
         </p>
         <Button className="mt-4">Damaged Product</Button>
-      </div>
+      </div> */}
     </main>
   );
 }
