@@ -1,0 +1,28 @@
+# Notes & Scratchpad
+
+## Identified Nouns
+- User: Represents employees and admins
+- Cash Flow: Represents daily financial transactions
+- Time Card: Represents employee clock-in and clock-out times
+- Vacation Request: Represents requests for vacation time
+- Battery: Represents battery products returned for checks or warranty
+- Notification: Represents alerts for admin users
+
+## Key Actions
+- Users: Register, login, update account details, clock in/out, submit vacation requests
+- Admins: Manage users, approve/reject vacation requests, monitor cash flows, manage batteries, view notifications
+- System: Record cash flows, log time cards, handle vacation requests, manage battery statuses, send notifications
+
+## Relationships
+- Users create and manage Time Cards
+- Users submit Vacation Requests
+- Users handle Batteries
+- Admins manage Users
+- Admins approve/reject Vacation Requests
+- Admins monitor Cash Flows
+- Admins receive Notifications
+
+## Additional Notes
+- The system will primarily be used internally on the local network.
+- Security measures will include local database authentication and role-based access control.
+- UI design will prioritize ease of use and clarity for both employees and admins.

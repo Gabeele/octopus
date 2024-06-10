@@ -1,0 +1,53 @@
+# Database Diagram for Octopus
+
+```mermaid
+erDiagram
+    USERS {
+        int id
+        string firstName
+        string lastName
+        string phoneNumber
+        string pin
+        boolean isAdmin
+    }
+    DAILY_CASH_FLOWS {
+        int id
+        date date
+        float initialCashCount
+        float endCashCount
+        json disbursements
+        json reimbursements
+        int userId
+    }
+    TIME_CARDS {
+        int id
+        int userId
+        datetime clockInTime
+        datetime clockOutTime
+        date date
+    }
+    VACATION_REQUESTS {
+        int id
+        int userId
+        date requestDate
+        date startDate
+        date endDate
+        string status
+    }
+    BATTERIES {
+        int id
+        string customerName
+        string customerPhone
+        string customerEmail
+        string batteryType
+        string condition
+        string notes
+        date checkInDate
+        string status
+        datetime lastUpdated
+        int userId
+    }
+    USERS ||--o{ DAILY_CASH_FLOWS : records
+    USERS ||--o{ TIME_CARDS : records
+    USERS ||--o{ VACATION_REQUESTS : requests
+    USERS ||--o{ BATTERIES : handles
