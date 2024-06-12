@@ -1,16 +1,16 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getProductSupportItem } from './action';
+import { getProductSupportTicket, updateProductStatus, updateProductProcess, updateProductResolution, addComment } from './action';
 import { usePathname } from 'next/navigation';
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { SelectGroup, SelectLabel } from '@radix-ui/react-select';
 
 export default function ProductSupportDetails({ params }) {
-    const id = usePathname().split('/').pop();
+    const id = parseInt(usePathname().split('/').pop());
     const [productData, setProductData] = useState(null);
     const [newComment, setNewComment] = useState('');
 
@@ -21,13 +21,30 @@ export default function ProductSupportDetails({ params }) {
     }, [id]);
 
     async function fetchProduct(id) {
-        const data = await getProductSupportItem(id);
+        const data = await getProductSupportTicket(id);
         setProductData(data);
     }
 
-    const handleCommentSubmit = () => {
-        // Handle comment submission logic here
-        console.log(newComment);
+    const handleStatusChange = async (newStatus, itemId) => {
+        await updateProductStatus(itemId, newStatus);
+        fetchProduct(id);
+    };
+
+    const handleProcessChange = async (newProcess, itemId) => {
+        await updateProductProcess(itemId, newProcess);
+        fetchProduct(id);
+    };
+
+    const handleResolutionChange = async (resolution, itemId) => {
+        await updateProductResolution(itemId, resolution);
+        fetchProduct(id);
+    };
+
+    const handleCommentSubmit = async () => {
+        if (newComment.trim() === '') return;
+        await addComment(id, newComment);
+        setNewComment('');
+        fetchProduct(id);
     };
 
     if (!productData) {
@@ -35,7 +52,7 @@ export default function ProductSupportDetails({ params }) {
     }
 
     return (
-        <div className="">
+        <div>
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold">Product Support Details</h1>
                 <div className="flex items-center space-x-2">

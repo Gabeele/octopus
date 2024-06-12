@@ -1,16 +1,12 @@
 'use client';
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
     TableRow,
+    TableCell,
+    Table
 } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { updateProductStatus, addComment } from './action';
+import { updateProductStatus, addComment, updateProductProcess, updateProductResolution, getProductSupportItem, getProductSupportTicket } from './action'; // Import the new function
 import { Badge } from '@/components/ui/badge';
 import {
     HoverCard,
@@ -18,7 +14,7 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -30,19 +26,51 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { format } from 'date-fns';
+import { Eye, Plus, PiggyBank, HandCoins, Trash2, Undo2, Replace } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-export default function SupportRecord(product) {
+export default function SupportRecord(initialProduct) {
     const [newComment, setNewComment] = useState('');
+    const [record, setRecord] = useState(initialProduct);
 
-    const handleStatusChange = async (newStatus, productId) => {
-        await updateProductStatus(productId, newStatus);
+    useEffect(() => {
+        fetchProduct(record.id);
+    }, [record.id]);
+
+    const fetchProduct = async (id) => {
+        const data = await getProductSupportTicket(id);
+        setRecord(data);
+    };
+
+    const handleStatusChange = async (newStatus, itemId) => {
+        await updateProductStatus(itemId, newStatus);
+        fetchProduct(record.id);
+    };
+
+    const handleProcessChange = async (newProcess, itemId) => {
+        await updateProductProcess(itemId, newProcess);
+        fetchProduct(record.id);
+    };
+
+    const handleResolutionChange = async (resolution, itemId) => {
+        await updateProductResolution(itemId, resolution);
+        fetchProduct(record.id);
     };
 
     const handleAddComment = async () => {
         if (newComment.trim() === '') return;
 
-        await addComment(product.id, newComment);
+        await addComment(record.id, newComment);
         setNewComment('');
+        fetchProduct(record.id);
     };
 
     const truncateText = (text, maxLength) => {
@@ -50,58 +78,125 @@ export default function SupportRecord(product) {
         return text.substring(0, maxLength) + '...';
     };
 
-    const mostRecentComment = product.comments.length > 0
-        ? product.comments[product.comments.length - 1].comment
+    const mostRecentComment = record.comments.length > 0
+        ? record.comments[record.comments.length - 1].comment
         : 'No comments';
 
     return (
-        <TableRow key={product.id}>
-            <TableCell>{product.customer_name}</TableCell>
-            <TableCell>{product.phone_number || 'N/A'}</TableCell>
-            <TableCell>{product.product}</TableCell>
-            <TableCell>{new Date(product.dropoff_date).toLocaleDateString()}</TableCell>
-            <TableCell>{product.isWholesale ? 'Wholesale' : 'Walk-in'}</TableCell>
-            <TableCell>
-                <Select id="process" defaultValue={product.process}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select process" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Inspecting">Inspecting</SelectItem>
-                        <SelectItem value="Charging">Charging</SelectItem>
-                        <SelectItem value="Holding">Holding</SelectItem>
-                        <SelectItem value="Resolved">Resolved</SelectItem>
-                    </SelectContent>
-                </Select>
+        <TableRow key={record.id}>
+            <TableCell className="max-w-xs">{record.customer_name}</TableCell>
+            <TableCell className="max-w-xs">{record.phone_number || 'N/A'}</TableCell>
+            <TableCell className="max-w-xs">{format(new Date(record.dropoff_date), 'PP')}</TableCell>
+            <TableCell className="max-w-xs">{record.isWholesale ? 'Wholesale' : 'Walk-in'}</TableCell>
+            <TableCell className="max-w-sm">
+                {record.items.map((item, index) => (
+                    <div key={item.id} className={`${index !== record.items.length - 1 ? 'mb-8' : ''}`}>
+                        {item.product} - {item.supportType}
+                    </div>
+                ))}
             </TableCell>
-            <TableCell>
-                <Select defaultValue={product.status} onValueChange={(newStatus) => handleStatusChange(newStatus, product.id)}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Broken">Broken</SelectItem>
-                        <SelectItem value="Dead Cell">Dead Cell</SelectItem>
-                        <SelectItem value="Worn">Worn</SelectItem>
-                        <SelectItem value="Not Holding Charge">Not Holding Charge</SelectItem>
-                        <SelectItem value="Good">Good</SelectItem>
-                    </SelectContent>
-                </Select>
+            <TableCell className="max-w-sm">
+                {record.items.map((item, index) => (
+                    <Select key={item.id} id="process" defaultValue={item.process} onValueChange={(newProcess) => handleProcessChange(newProcess, item.id)} >
+                        <SelectTrigger className={`${index !== record.items.length - 1 ? 'mb-4' : ''}`}>
+                            <SelectValue placeholder="Select process" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Inspecting">Inspecting</SelectItem>
+                            <SelectItem value="Charging">Charging</SelectItem>
+                            <SelectItem value="Holding">Holding</SelectItem>
+                            <SelectItem value="Resolved">Resolved</SelectItem>
+                        </SelectContent>
+                    </Select>
+                ))}
             </TableCell>
-            <TableCell style={{ maxWidth: '200px', wordWrap: 'break-word' }}>
+            <TableCell className="max-w-sm">
+                {record.items.map((item, index) => (
+                    <Select key={item.id} defaultValue={item.status} onValueChange={(newStatus) => handleStatusChange(newStatus, item.id)}>
+                        <SelectTrigger className={`${index !== record.items.length - 1 ? 'mb-4' : ''}`}>
+                            <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Broken">Broken</SelectItem>
+                            <SelectItem value="Dead Cell">Dead Cell</SelectItem>
+                            <SelectItem value="Worn">Worn</SelectItem>
+                            <SelectItem value="Not Holding Charge">Not Holding Charge</SelectItem>
+                            <SelectItem value="Good">Good</SelectItem>
+                        </SelectContent>
+                    </Select>
+                ))}
+            </TableCell>
+            <TableCell className="max-w-xs">
+                <div className="flex flex-col">
+                    {record.items.map((item, index) => (
+                        <DropdownMenu key={item.id}>
+                            <DropdownMenuTrigger asChild>
+                                <Button className={`${index !== record.items.length - 1 ? 'mb-4' : ''}`} variant="outline">
+                                    {item.isResolved ? `${item.resolution}` : 'Resolve'}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="max-w-xs">
+                                <DropdownMenuItem onClick={() => handleResolutionChange('Credited', item.id)}>
+                                    <PiggyBank className="mr-2 h-5 w-5" /> Credited
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResolutionChange('Scrapped', item.id)}>
+                                    <Trash2 className="mr-2 h-5 w-5" /> Scrapped
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResolutionChange('Returned', item.id)}>
+                                    <Undo2 className="mr-2 h-5 w-5" /> Returned
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResolutionChange('Refunded', item.id)}>
+                                    <HandCoins className="mr-2 h-5 w-5" /> Refunded
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResolutionChange('Warrantied', item.id)}>
+                                    <Replace className="mr-2 h-5 w-5" /> Warrantied
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ))}
+                </div>
+            </TableCell>
+            <TableCell className="max-w-40 break-words">
                 <HoverCard>
                     <HoverCardTrigger>
-                        <div className="inline-flex items-center">
-                            <span className='pr-1'>{truncateText(mostRecentComment, 50)}</span>
-                            <Badge>{product.comments.length}</Badge>
+                        <div className="inline-flex items-center text-center">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" className=""><Plus /></Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Add Comment</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="mt-4">
+                                        <Input
+                                            type="text"
+                                            value={newComment}
+                                            onChange={(e) => setNewComment(e.target.value)}
+                                            placeholder="Type your comment here"
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <DialogFooter>
+                                        <Button onClick={handleAddComment} className="mr-2">Submit</Button>
+                                        <DialogClose asChild>
+                                            <Button type="button" variant="secondary">
+                                                Close
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            <Badge className='ml-2'>{record.comments.length}</Badge>
+                            <p className='ml-2'>{truncateText(mostRecentComment, 50)}</p>
                         </div>
                     </HoverCardTrigger>
                     <HoverCardContent>
                         <div className="p-4">
                             <h4 className="text-lg font-bold">Comments</h4>
                             <ul>
-                                {product.comments.length > 0 ? (
-                                    product.comments.map(comment => (
+                                {record.comments.length > 0 ? (
+                                    record.comments.map(comment => (
                                         <li key={comment.id} className='py-2'>
                                             <div>{comment.comment}</div>
                                             <small>{new Date(comment.comment_date).toLocaleDateString()}</small>
@@ -115,38 +210,12 @@ export default function SupportRecord(product) {
                     </HoverCardContent>
                 </HoverCard>
             </TableCell>
-            <TableCell>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline">+ Comment</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Add Comment</DialogTitle>
-                        </DialogHeader>
-                        <div className="mt-4">
-                            <Input
-                                type="text"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Type your comment here"
-                                className="w-full"
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button onClick={handleAddComment} className="mr-2">Submit</Button>
-                            <DialogClose asChild>
-                                <Button type="button" variant="secondary">
-                                    Close
-                                </Button>
-                            </DialogClose>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-                <Link href={`/product-support/${product.id}`}>
-                    <Button variant="outline" className="ml-2">View</Button>
+
+            <TableCell className="max-w-xs">
+                <Link href={`/product-support/${record.id}`}>
+                    <Button variant="outline" className="ml-2 "><Eye className='h-5 w-5' />
+                    </Button>
                 </Link>
-                <Button variant="primary" className="ml-2">Resolve</Button>
             </TableCell>
         </TableRow>
     );

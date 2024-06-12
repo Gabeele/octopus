@@ -14,12 +14,12 @@ import SupportRecord from './support_record';
 import Link from 'next/link';
 
 export default function SupportTable() {
-    const [products, setProducts] = useState([]);
+    const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
     async function fetchData() {
-        const returns = await getSupportProducts();
-        setProducts(returns);
+        const tickets = await getSupportProducts();
+        setTickets(tickets);
         setLoading(false);
     }
 
@@ -32,25 +32,24 @@ export default function SupportTable() {
     }
 
     return (
-        <Table>
-            <TableCaption>Support Products</TableCaption>
+        <Table className="w-full">
             <TableHeader>
                 <TableRow>
                     <TableHead>Customer Name</TableHead>
                     <TableHead>Phone Number</TableHead>
-                    <TableHead>Product</TableHead>
                     <TableHead>Dropoff Date</TableHead>
                     <TableHead>Customer Type</TableHead>
+                    <TableHead>Product</TableHead>
                     <TableHead>Process</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Comments</TableHead>
+                    <TableHead></TableHead>
+                    <TableHead className="text-center">Comments</TableHead>
                     <TableHead></TableHead>
                 </TableRow>
-
             </TableHeader>
             <TableBody>
-                {products.map((product) => (
-                    <SupportRecord key={product.id} {...product} />
+                {tickets.map((ticket) => (
+                    <SupportRecord key={ticket.id} {...ticket} />
                 ))}
             </TableBody>
         </Table>
