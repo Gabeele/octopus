@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { updateProductStatus, addComment, updateProductProcess, updateProductResolution, getProductSupportItem, getProductSupportTicket } from './action'; // Import the new function
+import { updateProductStatus, addComment, updateProductProcess, updateProductResolution, getProductSupportTicket } from './action'; // Import the new function
 import { Badge } from '@/components/ui/badge';
 import {
     HoverCard,
@@ -14,7 +14,7 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { Input } from '@/components/ui/input';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -32,14 +32,13 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 export default function SupportRecord(initialProduct) {
     const [newComment, setNewComment] = useState('');
     const [record, setRecord] = useState(initialProduct);
+    const closeDialogRef = useRef(null); // Reference for DialogClose
 
     useEffect(() => {
         fetchProduct(record.id);
@@ -71,6 +70,11 @@ export default function SupportRecord(initialProduct) {
         await addComment(record.id, newComment);
         setNewComment('');
         fetchProduct(record.id);
+
+        // Close the dialog programmatically
+        if (closeDialogRef.current) {
+            closeDialogRef.current.click();
+        }
     };
 
     const truncateText = (text, maxLength) => {
@@ -182,7 +186,7 @@ export default function SupportRecord(initialProduct) {
                                     <DialogFooter>
                                         <Button onClick={handleAddComment} className="mr-2">Submit</Button>
                                         <DialogClose asChild>
-                                            <Button type="button" variant="secondary">
+                                            <Button ref={closeDialogRef} type="button" variant="secondary">
                                                 Close
                                             </Button>
                                         </DialogClose>
