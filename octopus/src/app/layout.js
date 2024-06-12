@@ -14,8 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <div className="flex h-screen w-full flex-col">
+      <body className="bg-gray-950">
+        <div className="flex h-screen w-full flex-col bg-gray-950">
           <header className="bg-gray-950 text-gray-50 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MountainIcon className="h-6 w-6" />
