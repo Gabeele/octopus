@@ -1,18 +1,23 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getProductSupportTicket, updateProductStatus, updateProductProcess, updateProductResolution, addComment } from './action';
+import { format } from 'date-fns';
+import { getProductSupportTicket, updateProductStatus, updateProductProcess, updateProductResolution, addComment, toggleLoaner } from './action';
 import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { SelectGroup, SelectLabel } from '@radix-ui/react-select';
+import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { useRouter } from 'next/navigation';
 
-export default function ProductSupportDetails({ params }) {
+export default function ProductSupportDetails() {
     const id = parseInt(usePathname().split('/').pop());
     const [productData, setProductData] = useState(null);
     const [newComment, setNewComment] = useState('');
+    const router = useRouter();
 
     useEffect(() => {
         if (id) {
@@ -47,142 +52,143 @@ export default function ProductSupportDetails({ params }) {
         fetchProduct(id);
     };
 
+    const handleHasLoanerChange = async (itemId) => {
+        await toggleLoaner(itemId);
+        fetchProduct(id);
+    };
+
+    const navigateToProductSupport = () => {
+        router.push('/product-support');
+    }
+
+
     if (!productData) {
         return <div>Loading...</div>;
     }
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold">Product Support Details</h1>
-                <div className="flex items-center space-x-2">
-                    <Button variant="outline">Resolve</Button>
-                    <Button variant="outline">Close</Button>
-                    <Button variant="outline">Escalate</Button>
+        <div className="">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-semibold">Product Support Details</h1>
+                <Button variant="outline" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
+            </div>
+            <div className="mb-6">
+                <div className="grid grid-cols-2 gap-4">
+                    <p><strong>Customer Name:</strong> {productData.customer_name}</p>
+                    <p><strong>Phone:</strong> {productData.phone_number ? productData.phone_number : 'N/A'}</p>
+                    <p><strong>Customer Type:</strong> {productData.isWholesale ? 'Wholesale' : 'Walk-in'}</p>
+                    <p><strong>Dropoff Date:</strong> {format(new Date(productData.dropoff_date), 'PP')}</p>
                 </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="grid gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="customer-name">Customer Name</Label>
-                            <p id="customer-name" className="text-gray-500 dark:text-gray-400">
-                                {productData.customer_name}
-                            </p>
-                        </div>
-                        <div>
-                            <Label htmlFor="phone-number">Phone Number</Label>
-                            <p id="phone-number" className="text-gray-500 dark:text-gray-400">
-                                {productData.phone_number || 'N/A'}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="process">Process</Label>
-                            <Select id="process" defaultValue={productData.process}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select process" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Inspecting">Inspecting</SelectItem>
-                                    <SelectItem value="Charging">Charging</SelectItem>
-                                    <SelectItem value="Holding">Holding</SelectItem>
-                                    <SelectItem value="Resolved">Resolved</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="status">Status</Label>
-                            <Select id="status" defaultValue={productData.status}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Broken">Broken</SelectItem>
-                                    <SelectItem value="Dead Cell">Dead Cell</SelectItem>
-                                    <SelectItem value="Worn">Worn</SelectItem>
-                                    <SelectItem value="Not Holding Charge">Not Holding Charge</SelectItem>
-                                    <SelectItem value="Good">Good</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="dropoff-date">Dropoff Date</Label>
-                            <p id="dropoff-date" className="text-gray-500 dark:text-gray-400">
-                                {new Date(productData.dropoff_date).toLocaleDateString()}
-                            </p>
-                        </div>
-                        <div>
-                            <Label htmlFor="wholesale-status">Customer Type</Label>
-                            <p id="wholesale-status" className="text-gray-500 dark:text-gray-400">
-                                {productData.isWholesale ? 'Wholesale' : 'Retail'}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="product-details">Product Details</Label>
-                            <p id="product-details" className="text-gray-500 dark:text-gray-400">
-                                {productData.product}
-                            </p>
-                        </div>
-                        <div>
-                            <Label htmlFor="age">Age</Label>
-                            <p id="age" className="text-gray-500 dark:text-gray-400">
-                                {productData.age || 'N/A'}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="cca">CCA</Label>
-                            <p id="cca" className="text-gray-500 dark:text-gray-400">
-                                {productData.cca || 'N/A'}
-                            </p>
-                        </div>
-                        <div>
-                            <Label htmlFor="voltage">Voltage</Label>
-                            <p id="voltage" className="text-gray-500 dark:text-gray-400">
-                                {productData.voltage || 'N/A'}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="has-loaner">Has Loaner</Label>
-                            <Checkbox id="has-loaner" defaultChecked={productData.hasLoaner} />
-                        </div>
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <div>
-                        <h2 className="text-xl font-bold mb-2">Comments</h2>
-                        <div className="space-y-4">
-                            {productData.comments.map(comment => (
-                                <div key={comment.id} className="space-y-2">
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold mb-2">Products</h2>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Product</TableHead>
+                            <TableHead>Age</TableHead>
+                            <TableHead>CCA</TableHead>
+                            <TableHead>Voltage</TableHead>
+                            <TableHead>Loaner</TableHead>
+                            <TableHead>Process</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Resolution</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {productData.items.map((item) => (
+                            <TableRow key={item.id}>
+                                <TableCell>{item.product} - {item.supportType}</TableCell>
+                                <TableCell>{item.age}  </TableCell>
+                                <TableCell>
+                                    {item.cca}
+                                </TableCell>
+                                <TableCell>
+                                    {item.voltage}
+                                </TableCell>
+                                <TableCell>
                                     <div className="flex items-center space-x-2">
-                                        <div className="font-medium">{comment.name}</div>
-                                        <div className="text-gray-500 text-sm">{new Date(comment.comment_date).toLocaleDateString()}</div>
+                                        <Checkbox id="loaner" checked={item.hasLoaner} onCheckedChange={() => handleHasLoanerChange(item.id)} />
+                                        <Label htmlFor="loaner">Has loaner</Label>
                                     </div>
-                                    <p>{comment.comment}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Textarea
-                            placeholder="Add a new comment..."
-                            className="w-full"
-                            rows={3}
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                        />
-                        <Button onClick={handleCommentSubmit}>Submit</Button>
-                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Select id={`process-${item.id}`} defaultValue={item.process} onValueChange={(newProcess) => handleProcessChange(newProcess, item.id)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Process" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Inspecting">Inspecting</SelectItem>
+                                            <SelectItem value="Charging">Charging</SelectItem>
+                                            <SelectItem value="Holding">Holding</SelectItem>
+                                            <SelectItem value="Stock">Stock</SelectItem>
+                                            <SelectItem value="Resolved">Resolved</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </TableCell>
+                                <TableCell>
+                                    <Select id={`status-${item.id}`} defaultValue={item.status} onValueChange={(newStatus) => handleStatusChange(newStatus, item.id)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Broken">Broken</SelectItem>
+                                            <SelectItem value="Dead Cell">Dead Cell</SelectItem>
+                                            <SelectItem value="Worn">Worn</SelectItem>
+                                            <SelectItem value="Not Holding Charge">Not Holding Charge</SelectItem>
+                                            <SelectItem value="Good">Good</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </TableCell>
+                                <TableCell className="flex flex-col items-right ">
+                                    <DropdownMenu key={item.id}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline">
+                                                {item.isResolved ? `${item.resolution} - ${format(new Date(productData.dropoff_date), 'PP')}` : 'Resolve'}
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="max-w-xs">
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('Credited', item.id)}>
+                                                <PiggyBank className="mr-2 h-5 w-5" /> Credited
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('Scrapped', item.id)}>
+                                                <Trash2 className="mr-2 h-5 w-5" /> Scrapped
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('Returned', item.id)}>
+                                                <Undo2 className="mr-2 h-5 w-5" /> Returned
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('Refunded', item.id)}>
+                                                <HandCoins className="mr-2 h-5 w-5" /> Refunded
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('Warrantied', item.id)}>
+                                                <Replace className="mr-2 h-5 w-5" /> Warrantied
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+
+                                </TableCell>
+
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold mb-2">Comments</h2>
+                <div className="space-y-2">
+                    {productData.comments.map(comment => (
+                        <p key={comment.id}><strong>{format(new Date(comment.comment_date), 'PP')}</strong> {comment.comment}</p>
+                    ))}
                 </div>
+                <Textarea
+                    placeholder="Add a new comment..."
+                    className="mt-4"
+                    rows={3}
+                    value={newComment}
+                    variant="primary"
+                    onChange={(e) => setNewComment(e.target.value)}
+                />
+                <Button className="mt-2" onClick={handleCommentSubmit}>Submit</Button>
             </div>
         </div>
     );

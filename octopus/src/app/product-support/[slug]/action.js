@@ -56,3 +56,19 @@ export async function addComment(ticketId, comment) {
         }
     });
 }
+
+export async function toggleLoaner(id) {
+    const currentItem = await prisma.productSupportItems.findUnique({
+        where: { id },
+        select: { hasLoaner: true },
+    });
+
+
+    const newHasLoanerValue = !currentItem.hasLoaner;
+
+    return await prisma.productSupportItems.update({
+        where: { id },
+        data: { hasLoaner: newHasLoanerValue },
+    });
+}
+

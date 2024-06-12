@@ -105,6 +105,7 @@ export default function SupportRecord(initialProduct) {
                             <SelectItem value="Inspecting">Inspecting</SelectItem>
                             <SelectItem value="Charging">Charging</SelectItem>
                             <SelectItem value="Holding">Holding</SelectItem>
+                            <SelectItem value="Stock">Stock</SelectItem>
                             <SelectItem value="Resolved">Resolved</SelectItem>
                         </SelectContent>
                     </Select>
