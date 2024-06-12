@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getSupportProducts } from './action';
+import { getSupportProducts, addSupportTicket } from './action';
 import SupportRecord from './support_record';
 import Link from 'next/link';
 import {
@@ -24,17 +24,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, X } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 export default function SupportTable() {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [includeResolved, setIncludeResolved] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const [newTicket, setNewTicket] = useState({
         name: '',
         phoneArea: '',
         phonePrefix: '',
         phoneLine: '',
-        date: '',
+        date: new Date().toISOString().split('T')[0],
         customerType: '',
         comment: '',
         products: [{ product: '', supportType: '', age: '', cca: '', voltage: '' }],
@@ -45,14 +48,29 @@ export default function SupportTable() {
     const lineRef = useRef(null);
 
     async function fetchData() {
-        const tickets = await getSupportProducts();
+        const tickets = await getSupportProducts(includeResolved, searchQuery);
         setTickets(tickets);
         setLoading(false);
     }
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [includeResolved, searchQuery]);
+
+    useEffect(() => {
+        if (!isModalOpen) {
+            setNewTicket({
+                name: '',
+                phoneArea: '',
+                phonePrefix: '',
+                phoneLine: '',
+                date: new Date().toISOString().split('T')[0],
+                customerType: '',
+                comment: '',
+                products: [{ product: '', supportType: '', age: '', cca: '', voltage: '' }],
+            });
+        }
+    }, [isModalOpen]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -91,6 +109,7 @@ export default function SupportTable() {
     };
 
     const handlePhoneChange = (field, value, nextFieldRef) => {
+        if (!/^\d*$/.test(value)) return;  // Allow only digits
         if (field === 'phoneLine' && value.length > 4) return;
         if (value.length <= 3 || (field === 'phoneLine' && value.length <= 4)) {
             setNewTicket((prevTicket) => ({
@@ -105,21 +124,72 @@ export default function SupportTable() {
 
     const handleSubmit = async () => {
         const formattedPhone = `${newTicket.phoneArea}${newTicket.phonePrefix}${newTicket.phoneLine}`;
-        const finalTicket = { ...newTicket, phone: formattedPhone };
+        const finalTicket = {
+            customer_name: newTicket.name,
+            dropoff_date: newTicket.date,
+            isWholesale: newTicket.customerType === 'Wholesale',
+            phone_number: formattedPhone,
+            products: newTicket.products.map(product => ({
+                product: product.product,
+                supportType: product.supportType,
+                age: product.age,
+                cca: parseInt(product.cca, 10),
+                voltage: parseFloat(product.voltage)
+            })),
+            comment: newTicket.comment
+        };
 
-        // Implement ticket creation logic here with finalTicket
-        // await createTicket(finalTicket);
+        await addSupportTicket(finalTicket);
+
+        fetchData();
         setIsModalOpen(false);
+
+        setNewTicket({
+            name: '',
+            phoneArea: '',
+            phonePrefix: '',
+            phoneLine: '',
+            date: new Date().toISOString().split('T')[0],
+            customerType: '',
+            comment: '',
+            products: [{ product: '', supportType: '', age: '', cca: '', voltage: '' }],
+        });
+    };
+
+    const isFormValid = () => {
+        return (
+            newTicket.name &&
+            newTicket.date &&
+            newTicket.customerType &&
+            newTicket.products.every(product => product.product) &&
+            newTicket.phoneArea.length === 3 &&
+            newTicket.phonePrefix.length === 3 &&
+            newTicket.phoneLine.length === 4
+        );
     };
 
     return (
         <div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Support Tickets</h2>
-                <Dialog>
-                    <DialogTrigger>
-                        <Button variant=""><PlusCircle className='h-5 w-5 mr-2' /> Add Ticket</Button>
-                    </DialogTrigger>
+                <div className="flex space-x-4">
+                    <div className="flex items-center space-x-1">
+                        <Input
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex items-center space-x-1">
+                        <Switch id="includeResolved" variant="outline" onClick={() => setIncludeResolved(!includeResolved)} />
+
+                        <Label htmlFor="includeResolved">Show Resolved</Label>
+                    </div>
+                    <Button variant="" onClick={() => setIsModalOpen(true)}>
+                        <PlusCircle className='h-5 w-5 mr-2' /> Add Ticket
+                    </Button>
+                </div>
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogContent className="min-w-fit">
                         <DialogHeader>
                             <DialogTitle>Add Ticket</DialogTitle>
@@ -135,6 +205,7 @@ export default function SupportTable() {
                                                 placeholder="Enter your name"
                                                 value={newTicket.name}
                                                 onChange={(e) => handleChange('name', e.target.value)}
+                                                required
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -181,6 +252,7 @@ export default function SupportTable() {
                                                 type="date"
                                                 value={newTicket.date}
                                                 onChange={(e) => handleChange('date', e.target.value)}
+                                                required
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -189,6 +261,7 @@ export default function SupportTable() {
                                                 id="customerType"
                                                 value={newTicket.customerType}
                                                 onValueChange={(value) => handleChange('customerType', value)}
+                                                required
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select customer type" />
@@ -234,6 +307,7 @@ export default function SupportTable() {
                                                             placeholder="Enter product name"
                                                             value={product.product}
                                                             onChange={(e) => handleProductChange(index, 'product', e.target.value)}
+                                                            required
                                                         />
                                                     </TableCell>
                                                     <TableCell>
@@ -263,14 +337,18 @@ export default function SupportTable() {
                                                         <Input
                                                             placeholder="Enter CCA"
                                                             value={product.cca}
-                                                            onChange={(e) => handleProductChange(index, 'cca', e.target.value)}
+                                                            onChange={(e) => handleProductChange(index, 'cca', parseInt(e.target.value, 10))}
+                                                            type="number"
+                                                            required
                                                         />
                                                     </TableCell>
                                                     <TableCell>
                                                         <Input
                                                             placeholder="Enter voltage"
                                                             value={product.voltage}
-                                                            onChange={(e) => handleProductChange(index, 'voltage', e.target.value)}
+                                                            onChange={(e) => handleProductChange(index, 'voltage', parseFloat(e.target.value, 10))}
+                                                            type="number"
+                                                            required
                                                         />
                                                     </TableCell>
                                                     <TableCell>
@@ -288,7 +366,7 @@ export default function SupportTable() {
                                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSubmit}>Create Ticket</Button>
+                                <Button onClick={handleSubmit} disabled={!isFormValid()}>Create Ticket</Button>
                             </div>
                         </div>
                     </DialogContent>

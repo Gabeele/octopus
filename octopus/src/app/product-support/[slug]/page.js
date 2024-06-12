@@ -122,6 +122,7 @@ export default function ProductSupportDetails() {
                                             <SelectItem value="Charging">Charging</SelectItem>
                                             <SelectItem value="Holding">Holding</SelectItem>
                                             <SelectItem value="Stock">Stock</SelectItem>
+                                            <SelectItem value="Calling">Calling</SelectItem>
                                             <SelectItem value="Resolved">Resolved</SelectItem>
                                         </SelectContent>
                                     </Select>
