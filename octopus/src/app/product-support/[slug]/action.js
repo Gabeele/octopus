@@ -72,3 +72,11 @@ export async function toggleLoaner(id) {
     });
 }
 
+// delete cascade on delete
+export async function deleteProductSupportTicket(id) {
+    return await prisma.productSupportTicket.delete({
+        where: { id },
+    });
+
+
+}

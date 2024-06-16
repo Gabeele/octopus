@@ -1,7 +1,7 @@
 'use server';
 import prisma from '@/lib/prisma';
 
-export async function getSupportProducts(includeResolved = false, searchQuery = '') {
+export async function getSupportProducts(includeResolved = false, searchQuery = '', page = 1, limit = 10) {
     const whereClause = {
         OR: [
             { customer_name: { contains: searchQuery, mode: 'insensitive' } },
@@ -17,15 +17,22 @@ export async function getSupportProducts(includeResolved = false, searchQuery = 
         };
     }
 
-    const tickets = await prisma.productSupportTicket.findMany({
-        where: whereClause,
-        include: {
-            items: true,
-            comments: true
-        }
-    });
-    return tickets;
+    const [tickets, total] = await Promise.all([
+        prisma.productSupportTicket.findMany({
+            where: whereClause,
+            include: {
+                items: true,
+                comments: true
+            },
+            skip: (page - 1) * limit,
+            take: limit
+        }),
+        prisma.productSupportTicket.count({ where: whereClause })
+    ]);
+
+    return { tickets, total };
 }
+
 
 export async function getProductSupportTicket(id) {
     const ticket = await prisma.productSupportTicket.findUnique({

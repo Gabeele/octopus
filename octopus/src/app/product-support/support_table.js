@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, RefreshCcw, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
 export default function SupportTable() {
@@ -32,6 +32,10 @@ export default function SupportTable() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [includeResolved, setIncludeResolved] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const ticketsPerPage = 10;
+
     const [newTicket, setNewTicket] = useState({
         name: '',
         phoneArea: '',
@@ -48,14 +52,16 @@ export default function SupportTable() {
     const lineRef = useRef(null);
 
     async function fetchData() {
-        const tickets = await getSupportProducts(includeResolved, searchQuery);
+        setLoading(true);
+        const { tickets, total } = await getSupportProducts(includeResolved, searchQuery, currentPage, ticketsPerPage);
         setTickets(tickets);
+        setTotalPages(Math.ceil(total / ticketsPerPage));
         setLoading(false);
     }
 
     useEffect(() => {
         fetchData();
-    }, [includeResolved, searchQuery]);
+    }, [includeResolved, searchQuery, currentPage]);
 
     useEffect(() => {
         if (!isModalOpen) {
@@ -161,11 +167,19 @@ export default function SupportTable() {
             newTicket.name &&
             newTicket.date &&
             newTicket.customerType &&
-            newTicket.products.every(product => product.product) &&
-            newTicket.phoneArea.length === 3 &&
-            newTicket.phonePrefix.length === 3 &&
-            newTicket.phoneLine.length === 4
+            newTicket.products.every(product => product.product)
         );
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
+    const handleIncludeResolvedChange = (checked) => {
+        setIncludeResolved(checked);
+        fetchData();
     };
 
     return (
@@ -173,6 +187,7 @@ export default function SupportTable() {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Support Tickets</h2>
                 <div className="flex space-x-4">
+                    <Button variant="outline" onClick={() => fetchData()}><RefreshCcw className='h-5 w-5' /></Button>
                     <div className="flex items-center space-x-1">
                         <Input
                             placeholder="Search..."
@@ -181,8 +196,7 @@ export default function SupportTable() {
                         />
                     </div>
                     <div className="flex items-center space-x-1">
-                        <Switch id="includeResolved" variant="outline" onClick={() => setIncludeResolved(!includeResolved)} />
-
+                        <Switch id="includeResolved" variant="outline" onCheckedChange={handleIncludeResolvedChange} checked={includeResolved} />
                         <Label htmlFor="includeResolved">Show Resolved</Label>
                     </div>
                     <Button variant="" onClick={() => setIsModalOpen(true)}>
@@ -199,10 +213,10 @@ export default function SupportTable() {
                                 <div className="grid gap-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="name">Name</Label>
+                                            <Label htmlFor="name">Name*</Label>
                                             <Input
                                                 id="name"
-                                                placeholder="Enter your name"
+                                                placeholder="Enter customer name"
                                                 value={newTicket.name}
                                                 onChange={(e) => handleChange('name', e.target.value)}
                                                 required
@@ -246,7 +260,7 @@ export default function SupportTable() {
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="date">Date</Label>
+                                            <Label htmlFor="date">Date*</Label>
                                             <Input
                                                 id="date"
                                                 type="date"
@@ -256,7 +270,7 @@ export default function SupportTable() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="customerType">Customer Type</Label>
+                                            <Label htmlFor="customerType">Customer Type*</Label>
                                             <Select
                                                 id="customerType"
                                                 value={newTicket.customerType}
@@ -285,7 +299,7 @@ export default function SupportTable() {
                                 </div>
                                 <div className="grid gap-4">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="font-medium">Products</h3>
+                                        <h3 className="font-medium">Products*</h3>
                                         <Button size="sm" onClick={handleAddProduct}>Add Product</Button>
                                     </div>
                                     <Table>
@@ -304,7 +318,7 @@ export default function SupportTable() {
                                                 <TableRow key={index}>
                                                     <TableCell>
                                                         <Input
-                                                            placeholder="Enter product name"
+                                                            placeholder="Enter product name*"
                                                             value={product.product}
                                                             onChange={(e) => handleProductChange(index, 'product', e.target.value)}
                                                             required
@@ -328,7 +342,7 @@ export default function SupportTable() {
                                                     </TableCell>
                                                     <TableCell>
                                                         <Input
-                                                            placeholder="Enter age"
+                                                            placeholder="Enter age (F11)"
                                                             value={product.age}
                                                             onChange={(e) => handleProductChange(index, 'age', e.target.value)}
                                                         />
@@ -394,6 +408,16 @@ export default function SupportTable() {
                     ))}
                 </TableBody>
             </Table>
+
+            <div className="flex justify-between items-center mt-4">
+                <Button variant="outline" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                    Previous
+                </Button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <Button variant="outline" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
+                    Next
+                </Button>
+            </div>
         </div >
     );
 }

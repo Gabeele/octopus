@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { getProductSupportTicket, updateProductStatus, updateProductProcess, updateProductResolution, addComment, toggleLoaner } from './action';
+import { getProductSupportTicket, updateProductStatus, updateProductProcess, updateProductResolution, addComment, toggleLoaner, deleteProductSupportTicket } from './action';
 import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,19 @@ import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace } from 'l
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 export default function ProductSupportDetails() {
     const id = parseInt(usePathname().split('/').pop());
@@ -61,6 +74,11 @@ export default function ProductSupportDetails() {
         router.push('/product-support');
     }
 
+    const handelDelete = async () => {
+        await deleteProductSupportTicket(id);
+        navigateToProductSupport();
+    }
+
 
     if (!productData) {
         return <div>Loading...</div>;
@@ -70,7 +88,30 @@ export default function ProductSupportDetails() {
         <div className="">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-semibold">Product Support Details</h1>
-                <Button variant="outline" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
+                <div>
+                    <AlertDialog>
+                        <AlertDialogTrigger>
+                            <Button variant='destructive'><Trash2 className='w-5 h-5 mr-2' />Delete</Button>
+
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete the ticket
+                                    and remove the data from the server.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handelDelete()}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    <Button variant="outline" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
+
+                </div>
             </div>
             <div className="mb-6">
                 <div className="grid grid-cols-2 gap-4">
