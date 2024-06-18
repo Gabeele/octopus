@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -32,11 +33,13 @@ export default function Home() {
       */}
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">
         <BoxIcon className="w-12 h-12 text-primary" />
-        <h3 className="text-xl font-bold mt-4">New Return</h3>
+        <h3 className="text-xl font-bold mt-4">Product Support</h3>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
-          Process a new return
+          Process a new return, warranty, recharge, and more.
         </p>
-        <Button className="mt-4">New Return</Button>
+        <Link href="/product-support">
+          <Button className="mt-4">Add Product</Button>
+        </Link>
       </div>
       {/*
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col items-center justify-center">

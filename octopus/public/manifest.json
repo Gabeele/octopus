@@ -1,0 +1,19 @@
+{
+  "theme_color": "#000040",
+  "background_color": "#000000",
+  "orientation": "landscape",
+  "display": "standalone",
+  "dir": "auto",
+  "lang": "en-US",
+  "name": "Octopus | Battery Wholesale Utility App",
+  "short_name": "Octopus",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "./logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
