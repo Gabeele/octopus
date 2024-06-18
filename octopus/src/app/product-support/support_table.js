@@ -51,13 +51,22 @@ export default function SupportTable() {
     const prefixRef = useRef(null);
     const lineRef = useRef(null);
 
-    async function fetchData() {
+    const debounce = (func, delay) => {
+        let debounceTimer;
+        return function (...args) {
+            const context = this;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        };
+    };
+
+    const fetchData = async () => {
         setLoading(true);
         const { tickets, total } = await getSupportProducts(includeResolved, searchQuery, currentPage, ticketsPerPage);
         setTickets(tickets);
         setTotalPages(Math.ceil(total / ticketsPerPage));
         setLoading(false);
-    }
+    };
 
     useEffect(() => {
         fetchData();
@@ -77,10 +86,6 @@ export default function SupportTable() {
             });
         }
     }, [isModalOpen]);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
 
     const handleAddProduct = () => {
         setNewTicket({
@@ -167,7 +172,7 @@ export default function SupportTable() {
             newTicket.name &&
             newTicket.date &&
             newTicket.customerType &&
-            newTicket.products.every(product => product.product)
+            newTicket.products.every(product => product.product && product.supportType)
         );
     };
 
@@ -179,8 +184,11 @@ export default function SupportTable() {
 
     const handleIncludeResolvedChange = (checked) => {
         setIncludeResolved(checked);
-        fetchData();
     };
+
+    const debouncedSearch = debounce((value) => {
+        setSearchQuery(value);
+    }, 300);
 
     return (
         <div>
@@ -191,8 +199,7 @@ export default function SupportTable() {
                     <div className="flex items-center space-x-1">
                         <Input
                             placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => debouncedSearch(e.target.value)}
                         />
                     </div>
                     <div className="flex items-center space-x-1">
