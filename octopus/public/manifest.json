@@ -2,7 +2,7 @@
   "theme_color": "#000040",
   "background_color": "#000000",
   "orientation": "landscape",
-  "display": "standalone",
+  "display": "minimal-ui",
   "dir": "auto",
   "lang": "en-US",
   "name": "Octopus | Battery Wholesale Utility App",

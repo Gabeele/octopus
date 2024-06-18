@@ -20,6 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
 
       <body className="bg-gray-950">
