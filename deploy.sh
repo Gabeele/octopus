@@ -9,10 +9,14 @@ git pull origin main
 
 # Step 2: Start the database service in detached mode
 echo "Starting the database service..."
-docker-compose up -d db
+sudo docker compose up -d db
 
 # Step 3: Build and run the web service in detached mode
 echo "Building and starting the web service..."
-docker-compose up --build -d web
+cd ~/Octopus/octopus
+npm install 
+npm run build # Needs to run to make the directory before docker compose will create it and rerun 
+cd ..
+sudo docker compose up --build -d web
 
 echo "Deployment completed successfully."
