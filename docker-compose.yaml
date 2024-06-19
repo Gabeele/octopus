@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: db
     image: postgres:13
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -13,15 +14,14 @@ services:
     restart: always
 
   web:
+    container_name: web
     build: ./octopus/.
     working_dir: /app
     volumes:
       - ./octopus:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
-    env_file:
-      - .env
+      - "80:3000"
     depends_on:
       - db
     restart: always
