@@ -4,7 +4,7 @@
 export $(grep -v '^#' .env | xargs)
 
 # container name
-CONTAINER_NAME="octopus-db-1"
+CONTAINER_NAME="db"
 
 # Set environment variables from .env file
 PGHOST=$PGSQL_HOST
