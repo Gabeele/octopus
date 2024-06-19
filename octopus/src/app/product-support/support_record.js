@@ -89,7 +89,7 @@ export default function SupportRecord(initialProduct) {
     return (
         <TableRow key={record.id}>
             <TableCell className="max-w-xs">{record.customer_name}</TableCell>
-            <TableCell className="max-w-xs">{record.phone_number || 'N/A'}</TableCell>
+            <TableCell className="max-w-xs">{record.phone_number || ''}</TableCell>
             <TableCell className="max-w-xs">{format(new Date(record.dropoff_date), 'PP')}</TableCell>
             <TableCell className="max-w-xs">{record.isWholesale ? 'Wholesale' : 'Walk-in'}</TableCell>
             <TableCell className="max-w-sm">

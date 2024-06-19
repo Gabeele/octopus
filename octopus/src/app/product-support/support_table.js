@@ -134,7 +134,14 @@ export default function SupportTable() {
     };
 
     const handleSubmit = async () => {
-        const formattedPhone = `${newTicket.phoneArea}${newTicket.phonePrefix}${newTicket.phoneLine}`;
+        const phoneArea = newTicket.phoneArea ? newTicket.phoneArea : '';
+        const phonePrefix = newTicket.phonePrefix ? newTicket.phonePrefix : '';
+        const phoneLine = newTicket.phoneLine ? newTicket.phoneLine : '';
+
+        const formattedPhone = phoneArea && phonePrefix && phoneLine
+            ? `(${phoneArea}) ${phonePrefix}-${phoneLine}`
+            : '';
+
         const finalTicket = {
             customer_name: newTicket.name,
             dropoff_date: newTicket.date,
@@ -315,8 +322,8 @@ export default function SupportTable() {
                                                 <TableHead>Product</TableHead>
                                                 <TableHead>Support Type</TableHead>
                                                 <TableHead>Age</TableHead>
-                                                <TableHead>CCA</TableHead>
                                                 <TableHead>Voltage</TableHead>
+                                                <TableHead>CCA</TableHead>
                                                 <TableHead />
                                             </TableRow>
                                         </TableHeader>
@@ -356,18 +363,18 @@ export default function SupportTable() {
                                                     </TableCell>
                                                     <TableCell>
                                                         <Input
-                                                            placeholder="Enter CCA"
-                                                            value={product.cca}
-                                                            onChange={(e) => handleProductChange(index, 'cca', parseInt(e.target.value, 10))}
+                                                            placeholder="Enter voltage"
+                                                            value={product.voltage}
+                                                            onChange={(e) => handleProductChange(index, 'voltage', parseFloat(e.target.value, 10))}
                                                             type="number"
                                                             required
                                                         />
                                                     </TableCell>
                                                     <TableCell>
                                                         <Input
-                                                            placeholder="Enter voltage"
-                                                            value={product.voltage}
-                                                            onChange={(e) => handleProductChange(index, 'voltage', parseFloat(e.target.value, 10))}
+                                                            placeholder="Enter CCA"
+                                                            value={product.cca}
+                                                            onChange={(e) => handleProductChange(index, 'cca', parseInt(e.target.value, 10))}
                                                             type="number"
                                                             required
                                                         />

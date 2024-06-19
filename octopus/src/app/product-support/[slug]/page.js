@@ -128,8 +128,8 @@ export default function ProductSupportDetails() {
                         <TableRow>
                             <TableHead>Product</TableHead>
                             <TableHead>Age</TableHead>
-                            <TableHead>CCA</TableHead>
                             <TableHead>Voltage</TableHead>
+                            <TableHead>CCA</TableHead>
                             <TableHead>Loaner</TableHead>
                             <TableHead>Process</TableHead>
                             <TableHead>Status</TableHead>
@@ -142,10 +142,10 @@ export default function ProductSupportDetails() {
                                 <TableCell>{item.product} - {item.supportType}</TableCell>
                                 <TableCell>{item.age}  </TableCell>
                                 <TableCell>
-                                    {item.cca}
+                                    {item.voltage}
                                 </TableCell>
                                 <TableCell>
-                                    {item.voltage}
+                                    {item.cca}
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center space-x-2">

@@ -24,7 +24,7 @@ export default function RootLayout({
       </head>
 
       <body className="bg-gray-950">
-        <div className="flex h-screen w-full flex-col bg-gray-950">
+        <div className="flex min-h-screen w-full flex-col bg-gray-950">
           <header className="bg-gray-950 text-gray-50 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Image src='logo.svg' width="24" height="24" />
