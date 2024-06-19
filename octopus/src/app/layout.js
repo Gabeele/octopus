@@ -11,7 +11,7 @@ export const metadata = {
   keywords: "battery, utility, wholesale, inventory, warranty, schedule, app",
 };
 
-const version = process.env.version;
+const version = process.env.VERSION;
 
 export default function RootLayout({
   children,
