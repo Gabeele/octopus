@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace } from 'lucide-react';
+import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace, Recycle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
@@ -207,7 +207,7 @@ export default function ProductSupportDetails() {
                                                 <Replace className="mr-2 h-5 w-5" /> Warrantied
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => handleResolutionChange('Recon', item.id)}>
-                                                <Replace className="mr-2 h-5 w-5" /> Recon
+                                                <Recycle className="mr-2 h-5 w-5" /> Recon
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

@@ -27,7 +27,7 @@ import {
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { ReceiptText, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace } from "lucide-react";
+import { ReceiptText, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace, Recycle } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -158,7 +158,7 @@ export default function SupportRecord(initialProduct) {
                                     <Replace className="mr-2 h-5 w-5" /> Warrantied
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleResolutionChange('Recon', item.id)}>
-                                    <Replace className="mr-2 h-5 w-5" /> Recon
+                                    <Recycle className="mr-2 h-5 w-5" /> Recon
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

@@ -112,12 +112,14 @@ export async function addSupportTicket(ticketDetails) {
                     isResolved: false // default value
                 }))
             },
-            comments: {
-                create: {
-                    comment,
-                    comment_date: new Date()
+            ...(comment && {
+                comments: {
+                    create: {
+                        comment,
+                        comment_date: new Date()
+                    }
                 }
-            }
+            })
         },
         include: {
             items: true,
