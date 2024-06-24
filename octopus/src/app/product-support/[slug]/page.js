@@ -109,7 +109,7 @@ export default function ProductSupportDetails() {
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    <Button variant="outline" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
+                    <Button variant="outline" className="ml-2" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
 
                 </div>
             </div>
@@ -153,27 +153,28 @@ export default function ProductSupportDetails() {
                                         <Label htmlFor="loaner">Has loaner</Label>
                                     </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="max-w-28 min-w-28">
                                     <Select id={`process-${item.id}`} defaultValue={item.process} onValueChange={(newProcess) => handleProcessChange(newProcess, item.id)}>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="bg-white">
                                             <SelectValue placeholder="Process" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="Inspecting">Inspecting</SelectItem>
                                             <SelectItem value="Charging">Charging</SelectItem>
-                                            <SelectItem value="Holding">Holding</SelectItem>
+                                            <SelectItem value="Sitting">Sitting</SelectItem>
                                             <SelectItem value="Stock">Stock</SelectItem>
                                             <SelectItem value="Calling">Calling</SelectItem>
                                             <SelectItem value="Resolved">Resolved</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="max-w-28 min-w-28">
                                     <Select id={`status-${item.id}`} defaultValue={item.status} onValueChange={(newStatus) => handleStatusChange(newStatus, item.id)}>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="bg-white">
                                             <SelectValue placeholder="Status" />
                                         </SelectTrigger>
                                         <SelectContent>
+                                            <SelectItem value=" - "> - </SelectItem>
                                             <SelectItem value="Broken">Broken</SelectItem>
                                             <SelectItem value="Dead Cell">Dead Cell</SelectItem>
                                             <SelectItem value="Worn">Worn</SelectItem>
@@ -205,6 +206,9 @@ export default function ProductSupportDetails() {
                                             <DropdownMenuItem onClick={() => handleResolutionChange('Warrantied', item.id)}>
                                                 <Replace className="mr-2 h-5 w-5" /> Warrantied
                                             </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('Recon', item.id)}>
+                                                <Replace className="mr-2 h-5 w-5" /> Recon
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
 
@@ -224,11 +228,12 @@ export default function ProductSupportDetails() {
                 </div>
                 <Textarea
                     placeholder="Add a new comment..."
-                    className="mt-4"
+                    className="mt-4 bg-white"
                     rows={3}
                     value={newComment}
                     variant="primary"
                     onChange={(e) => setNewComment(e.target.value)}
+
                 />
                 <Button className="mt-2" onClick={handleCommentSubmit}>Submit</Button>
             </div>

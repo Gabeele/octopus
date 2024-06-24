@@ -134,7 +134,7 @@ export default function SupportTable() {
     };
 
     const handleSubmit = async () => {
-        const formattedPhone = `${newTicket.phoneArea}${newTicket.phonePrefix}${newTicket.phoneLine}`;
+        const formattedPhone = `(${newTicket.phoneArea}) ${newTicket.phonePrefix}-${newTicket.phoneLine}`;
         const finalTicket = {
             customer_name: newTicket.name,
             dropoff_date: newTicket.date,
@@ -147,7 +147,7 @@ export default function SupportTable() {
                 cca: parseInt(product.cca, 10),
                 voltage: parseFloat(product.voltage)
             })),
-            comment: newTicket.comment
+            ...(newTicket.comment && { comment: newTicket.comment })
         };
 
         await addSupportTicket(finalTicket);
@@ -397,10 +397,7 @@ export default function SupportTable() {
             <Table className="w-full">
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Customer Name</TableHead>
-                        <TableHead>Phone Number</TableHead>
-                        <TableHead>Dropoff Date</TableHead>
-                        <TableHead>Customer Type</TableHead>
+                        <TableHead>Customer</TableHead>
                         <TableHead>Product</TableHead>
                         <TableHead>Process</TableHead>
                         <TableHead>Status</TableHead>

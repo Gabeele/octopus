@@ -27,7 +27,7 @@ import {
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Eye, Plus, PiggyBank, HandCoins, Trash2, Undo2, Replace } from "lucide-react";
+import { ReceiptText, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -87,11 +87,10 @@ export default function SupportRecord(initialProduct) {
         : 'No comments';
 
     return (
-        <TableRow key={record.id}>
-            <TableCell className="max-w-xs">{record.customer_name}</TableCell>
-            <TableCell className="max-w-xs">{record.phone_number || 'N/A'}</TableCell>
-            <TableCell className="max-w-xs">{format(new Date(record.dropoff_date), 'PP')}</TableCell>
-            <TableCell className="max-w-xs">{record.isWholesale ? 'Wholesale' : 'Walk-in'}</TableCell>
+        <TableRow key={record.id} className="border-gray-400 ">
+            <TableCell className="max-w-xs"><div><span className='font-bold'>{record.customer_name}</span>{record.phone_number ? ', ' + record.phone_number : ' '}</div><div>
+                {format(new Date(record.dropoff_date), 'PP')}, {record.isWholesale ? 'Wholesale' : 'Walk-in'}</div></TableCell>
+
             <TableCell className="max-w-sm">
                 {record.items.map((item, index) => (
                     <div key={item.id} className={`${index !== record.items.length - 1 ? 'mb-8' : ''}`}>
@@ -99,16 +98,16 @@ export default function SupportRecord(initialProduct) {
                     </div>
                 ))}
             </TableCell>
-            <TableCell className="max-w-sm">
+            <TableCell className="max-w-28 min-w-28">
                 {record.items.map((item, index) => (
                     <Select key={item.id} id="process" defaultValue={item.process} onValueChange={(newProcess) => handleProcessChange(newProcess, item.id)} >
-                        <SelectTrigger className={`${index !== record.items.length - 1 ? 'mb-4' : ''}`}>
+                        <SelectTrigger className={`${index !== record.items.length - 1 ? 'mb-4' : ''} bg-white`}>
                             <SelectValue placeholder="Select process" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="Inspecting">Inspecting</SelectItem>
                             <SelectItem value="Charging">Charging</SelectItem>
-                            <SelectItem value="Holding">Holding</SelectItem>
+                            <SelectItem value="Sitting">Sitting</SelectItem>
                             <SelectItem value="Stock">Stock</SelectItem>
                             <SelectItem value="Calling">Calling</SelectItem>
                             <SelectItem value="Resolved">Resolved</SelectItem>
@@ -116,13 +115,14 @@ export default function SupportRecord(initialProduct) {
                     </Select>
                 ))}
             </TableCell>
-            <TableCell className="max-w-sm">
+            <TableCell className="max-w-28 min-w-28">
                 {record.items.map((item, index) => (
                     <Select key={item.id} defaultValue={item.status} onValueChange={(newStatus) => handleStatusChange(newStatus, item.id)}>
-                        <SelectTrigger className={`${index !== record.items.length - 1 ? 'mb-4' : ''}`}>
+                        <SelectTrigger className={`${index !== record.items.length - 1 ? 'mb-4' : ''} bg-white`}>
                             <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value=" - "> - </SelectItem>
                             <SelectItem value="Broken">Broken</SelectItem>
                             <SelectItem value="Dead Cell">Dead Cell</SelectItem>
                             <SelectItem value="Worn">Worn</SelectItem>
@@ -132,12 +132,12 @@ export default function SupportRecord(initialProduct) {
                     </Select>
                 ))}
             </TableCell>
-            <TableCell className="max-w-xs">
+            <TableCell className="max-w-28 min-w-28">
                 <div className="flex flex-col">
                     {record.items.map((item, index) => (
                         <DropdownMenu key={item.id}>
                             <DropdownMenuTrigger asChild>
-                                <Button className={`${index !== record.items.length - 1 ? 'mb-4' : ''}`} variant="outline">
+                                <Button className={`${index !== record.items.length - 1 ? 'mb-4' : ''} ${item.isResolved ? 'bg-gray-300' : ''}`} variant="outline">
                                     {item.isResolved ? `${item.resolution}` : 'Resolve'}
                                 </Button>
                             </DropdownMenuTrigger>
@@ -157,18 +157,21 @@ export default function SupportRecord(initialProduct) {
                                 <DropdownMenuItem onClick={() => handleResolutionChange('Warrantied', item.id)}>
                                     <Replace className="mr-2 h-5 w-5" /> Warrantied
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResolutionChange('Recon', item.id)}>
+                                    <Replace className="mr-2 h-5 w-5" /> Recon
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ))}
                 </div>
             </TableCell>
-            <TableCell className="max-w-40 break-words">
+            <TableCell className="max-w-40 break-words text-center">
                 <HoverCard>
                     <HoverCardTrigger>
                         <div className="inline-flex items-center text-center">
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button variant="outline" className=""><Plus /></Button>
+                                    <Button variant="outline" className=""><MessageSquareDiff /></Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
@@ -194,11 +197,10 @@ export default function SupportRecord(initialProduct) {
                                 </DialogContent>
                             </Dialog>
                             <Badge className='ml-2'>{record.comments.length}</Badge>
-                            <p className='ml-2'>{truncateText(mostRecentComment, 50)}</p>
                         </div>
                     </HoverCardTrigger>
                     <HoverCardContent>
-                        <div className="p-4">
+                        <div className="p-4 text-left">
                             <h4 className="text-lg font-bold">Comments</h4>
                             <ul>
                                 {record.comments.length > 0 ? (
@@ -217,9 +219,10 @@ export default function SupportRecord(initialProduct) {
                 </HoverCard>
             </TableCell>
 
-            <TableCell className="max-w-xs">
+            <TableCell className="max-w-xs text-right">
+
                 <Link href={`/product-support/${record.id}`}>
-                    <Button variant="outline" className="ml-2 "><Eye className='h-5 w-5' />
+                    <Button variant="outline" className=""><ReceiptText className='h-5 w-5' />
                     </Button>
                 </Link>
             </TableCell>
