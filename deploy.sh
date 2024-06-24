@@ -13,9 +13,9 @@ sudo docker compose up -d db
 
 # Step 3: Build and run the web service in detached mode
 echo "Building and starting the web service..."
-cd ~/Octopus/octopus
+cd ./octopus
 npm install 
-npm run build # Needs to run to make the directory before docker compose will create it and rerun 
+# npm run build # Needs to run to make the directory before docker compose will create it and rerun 
 cd ..
 sudo docker compose up --build -d web
 

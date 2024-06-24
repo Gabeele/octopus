@@ -5,14 +5,13 @@ FROM node:latest
 WORKDIR /app
 
 # Copy package.json and package-lock.json files to the working directory
-COPY package.json ./
-COPY package-lock.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application code
-COPY . .
+COPY . ./
 
 # Run Prisma migrations
 RUN npx prisma migrate dev
@@ -20,11 +19,8 @@ RUN npx prisma migrate dev
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build the application
-RUN npm run build
-
 # Expose the port the app runs on
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
