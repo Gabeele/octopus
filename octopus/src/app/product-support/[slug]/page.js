@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { useState, useEffect, useRef } from 'react';
+import { format, addDays } from 'date-fns';
 import { getProductSupportTicket, updateProductStatus, updateProductProcess, updateProductResolution, addComment, toggleLoaner, deleteProductSupportTicket } from './action';
 import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace, Recycle } from 'lucide-react';
+import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace, Recycle, Printer } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
@@ -25,12 +25,12 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-
 export default function ProductSupportDetails() {
     const id = parseInt(usePathname().split('/').pop());
     const [productData, setProductData] = useState(null);
     const [newComment, setNewComment] = useState('');
     const router = useRouter();
+    const printRef = useRef();
 
     useEffect(() => {
         if (id) {
@@ -79,6 +79,15 @@ export default function ProductSupportDetails() {
         navigateToProductSupport();
     }
 
+    const handlePrint = () => {
+        const printContents = printRef.current.innerHTML;
+        const originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        window.location.reload();
+    };
 
     if (!productData) {
         return <div>Loading...</div>;
@@ -89,10 +98,11 @@ export default function ProductSupportDetails() {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-semibold">Product Support Details</h1>
                 <div>
+                    <Button variant="outline" className="mr-2" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
+                    <Button variant="outline" className="mr-2" onClick={handlePrint}><Printer className='h-5 w-5 mr-2' />Print</Button>
                     <AlertDialog>
                         <AlertDialogTrigger>
                             <Button variant='destructive'><Trash2 className='w-5 h-5 mr-2' />Delete</Button>
-
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
@@ -109,10 +119,10 @@ export default function ProductSupportDetails() {
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    <Button variant="outline" className="ml-2" onClick={() => navigateToProductSupport()}><ArrowLeftCircle className='mr-2 h-5 w-5' /> Back</Button>
 
                 </div>
             </div>
+
             <div className="mb-6">
                 <div className="grid grid-cols-2 gap-4">
                     <p><strong>Customer Name:</strong> {productData.customer_name}</p>
@@ -134,19 +144,16 @@ export default function ProductSupportDetails() {
                             <TableHead>Process</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Resolution</TableHead>
+                            <TableHead>Last Pickup Date</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {productData.items.map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell>{item.product} - {item.supportType}</TableCell>
-                                <TableCell>{item.age}  </TableCell>
-                                <TableCell>
-                                    {item.voltage}
-                                </TableCell>
-                                <TableCell>
-                                    {item.cca}
-                                </TableCell>
+                                <TableCell>{item.age}</TableCell>
+                                <TableCell>{item.voltage}</TableCell>
+                                <TableCell>{item.cca}</TableCell>
                                 <TableCell>
                                     <div className="flex items-center space-x-2">
                                         <Checkbox id="loaner" checked={item.hasLoaner} onCheckedChange={() => handleHasLoanerChange(item.id)} />
@@ -211,9 +218,10 @@ export default function ProductSupportDetails() {
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-
                                 </TableCell>
-
+                                <TableCell>
+                                    {format(addDays(new Date(productData.dropoff_date), 30), 'PP')}
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -233,10 +241,79 @@ export default function ProductSupportDetails() {
                     value={newComment}
                     variant="primary"
                     onChange={(e) => setNewComment(e.target.value)}
-
                 />
                 <Button className="mt-2" onClick={handleCommentSubmit}>Submit</Button>
             </div>
-        </div>
+
+            {/* Hidden print content */}
+            <div className="hidden">
+                <div ref={printRef}>
+                    <div className="flex text-left mb-5 text-sm">
+                        <img src="/BW-logo.jpg" alt="Battery Wholesale" className="w-20" />
+                        <div className="pl-2">
+                            <p>320 Lawrence Ave, Kitchener N2M 1Y4</p>
+                            <p>(519) 743-2087 sales@batterywholesale.ca</p>
+                        </div>
+                    </div>
+                    <hr />
+                    <h1 className="text-center text-lg font-bold mt-4">Product Support Details</h1>
+                    <hr className="my-4" />
+                    <div className="mb-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <p><strong>Customer Name:</strong> {productData.customer_name}</p>
+                            <p><strong>Phone:</strong> {productData.phone_number ? productData.phone_number : 'N/A'}</p>
+                            <p><strong>Customer Type:</strong> {productData.isWholesale ? 'Wholesale' : 'Walk-in'}</p>
+                            <p><strong>Dropoff Date:</strong> {format(new Date(productData.dropoff_date), 'PP')}</p>
+                        </div>
+                    </div>
+                    <div className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">Products</h2>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product</TableHead>
+                                    <TableHead>Age</TableHead>
+                                    <TableHead>Voltage</TableHead>
+                                    <TableHead>CCA</TableHead>
+                                    <TableHead>Loaner</TableHead>
+                                    <TableHead>Process</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Resolution</TableHead>
+                                    <TableHead>Last Pickup Date</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {productData.items.map((item) => (
+                                    <TableRow key={item.id}>
+                                        <TableCell>{item.product} - {item.supportType}</TableCell>
+                                        <TableCell>{item.age}</TableCell>
+                                        <TableCell>{item.voltage}</TableCell>
+                                        <TableCell>{item.cca}</TableCell>
+                                        <TableCell>{item.hasLoaner ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell>{item.process}</TableCell>
+                                        <TableCell>{item.status}</TableCell>
+                                        <TableCell>{item.isResolved ? `${item.resolution} - ${format(new Date(item.resolution_date), 'PP')}` : 'Pending'}</TableCell>
+                                        <TableCell>                                    {format(addDays(new Date(productData.dropoff_date), 30), 'PP')}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <div className="mb-6">
+                        {productData.comments.length > 0 && <h2 className="text-xl font-semibold mb-2">Comments</h2>}
+                        <div className="space-y-2">
+                            {productData.comments.map(comment => (
+                                <p key={comment.id}><strong>{format(new Date(comment.comment_date), 'PP')}</strong> {comment.comment}</p>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="fixed bottom-2 w-full text-xs text-gray-400 text-left">
+                        <p><strong>Disclaimer:</strong> Products must be collected within 30 days of the drop-off date. Items not picked up within this period may be discarded, and Battery Wholesale is not liable for unclaimed products. It is the customer's responsibility to maintain communication regarding their items. Battery Wholesale is not responsible for damages or loss during the warranty period or while in storage. All warranties provided by Battery Wholesale and their manufacturers are strictly limited to defects in materials or manufacturing, not abuse or misuse. The validity and execution of warranties are at the discretion of Battery Wholesale and the manufacturer. Lack of communication from Battery Wholesale does not relieve customers of their responsibility to collect items or address concerns within the 30-day period. Battery Wholesale is not liable for consequential or incidental damages, including but not limited to loss of use, data, or business profits, related to the storage or handling of customer products.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div >
     );
 }
