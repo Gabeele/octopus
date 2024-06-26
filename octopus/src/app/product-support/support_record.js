@@ -27,7 +27,7 @@ import {
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { ReceiptText, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace, Recycle } from "lucide-react";
+import { ReceiptText, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace, Recycle, PackageOpen } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -142,6 +142,9 @@ export default function SupportRecord(initialProduct) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="max-w-xs">
+                                <DropdownMenuItem onClick={() => handleResolutionChange('null', item.id)}>
+                                    <PackageOpen className="mr-2 h-5 w-5" /> Reopen (Null)
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleResolutionChange('Credited', item.id)}>
                                     <PiggyBank className="mr-2 h-5 w-5" /> Credited
                                 </DropdownMenuItem>

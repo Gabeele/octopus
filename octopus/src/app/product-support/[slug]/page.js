@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace, Recycle, Printer } from 'lucide-react';
+import { ArrowLeftCircle, PiggyBank, Trash2, Undo2, HandCoins, Replace, Recycle, Printer, PackageOpen } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
 
 export default function ProductSupportDetails() {
     const id = parseInt(usePathname().split('/').pop());
@@ -36,6 +37,7 @@ export default function ProductSupportDetails() {
         if (id) {
             fetchProduct(id);
         }
+
     }, [id]);
 
     async function fetchProduct(id) {
@@ -90,7 +92,14 @@ export default function ProductSupportDetails() {
     };
 
     if (!productData) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <Skeleton className="w-[200px] h-[40px] mb-2 rounded" />
+                <Skeleton className="w-full h-[40px] mb-2 rounded" />
+                <Skeleton className="w-full h-[40px] mb-2 rounded" />
+                <Skeleton className="w-full h-[40px] mb-2 rounded" />
+            </div>
+        );
     }
 
     return (
@@ -194,10 +203,14 @@ export default function ProductSupportDetails() {
                                     <DropdownMenu key={item.id}>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="outline">
-                                                {item.isResolved ? `${item.resolution} - ${format(new Date(productData.dropoff_date), 'PP')}` : 'Resolve'}
+                                                {item.isResolved ? `${item.resolution} on ${format(new Date(item.resolveDate), 'PP')}` : 'Resolve'}
                                             </Button>
                                         </DropdownMenuTrigger>
+
                                         <DropdownMenuContent className="max-w-xs">
+                                            <DropdownMenuItem onClick={() => handleResolutionChange('null', item.id)}>
+                                                <PackageOpen className="mr-2 h-5 w-5" /> Reopen (Null)
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => handleResolutionChange('Credited', item.id)}>
                                                 <PiggyBank className="mr-2 h-5 w-5" /> Credited
                                             </DropdownMenuItem>
@@ -246,7 +259,7 @@ export default function ProductSupportDetails() {
             </div>
 
             {/* Hidden print content */}
-            <div className="hidden">
+            <div className="hidden" >
                 <div ref={printRef}>
                     <div className="flex text-left mb-5 text-sm">
                         <img src="/BW-logo.jpg" alt="Battery Wholesale" className="w-20" />
@@ -292,7 +305,7 @@ export default function ProductSupportDetails() {
                                         <TableCell>{item.hasLoaner ? 'Yes' : 'No'}</TableCell>
                                         <TableCell>{item.process}</TableCell>
                                         <TableCell>{item.status}</TableCell>
-                                        <TableCell>{item.isResolved ? `${item.resolution} - ${format(new Date(item.resolution_date), 'PP')}` : 'Pending'}</TableCell>
+                                        <TableCell>{item.isResolved ? `${item.resolution} on ${format(new Date(item.resolveDate), 'PP')}` : 'Pending'}</TableCell>
                                         <TableCell>                                    {format(addDays(new Date(productData.dropoff_date), 30), 'PP')}
                                         </TableCell>
                                     </TableRow>

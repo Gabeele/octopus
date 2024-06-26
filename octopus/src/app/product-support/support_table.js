@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getSupportProducts, addSupportTicket } from './action';
+import { getSupportProducts, addSupportTicket, getNotifications } from './action';
 import SupportRecord from './support_record';
 import Link from 'next/link';
 import {
@@ -25,6 +25,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, RefreshCcw, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
+import { Badge } from '@/components/ui/badge';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import NotificationTray from './notifications_tray';
+
 
 export default function SupportTable() {
     const [tickets, setTickets] = useState([]);
@@ -34,7 +48,9 @@ export default function SupportTable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const ticketsPerPage = 10;
+
+
+    const ticketsPerPage = 20;
 
     const [newTicket, setNewTicket] = useState({
         name: '',
@@ -71,6 +87,7 @@ export default function SupportTable() {
     useEffect(() => {
         fetchData();
     }, [includeResolved, searchQuery, currentPage]);
+
 
     useEffect(() => {
         if (!isModalOpen) {
@@ -203,10 +220,14 @@ export default function SupportTable() {
                 <h2 className="text-2xl font-semibold">Support Tickets</h2>
                 <div className="flex space-x-4">
                     <Button variant="outline" onClick={() => fetchData()}><RefreshCcw className='h-5 w-5' /></Button>
-                    <div className="flex items-center space-x-1">
+                    <div className="relative inline-block">
+                        <NotificationTray />
+                    </div>
+                    <div className="flex items-center space-x-1 w-72">
                         <Input
-                            placeholder="Search..."
+                            placeholder="Search phone, name, product..."
                             onChange={(e) => debouncedSearch(e.target.value)}
+                            className="w-full bg-white"
                         />
                     </div>
                     <div className="flex items-center space-x-1">
@@ -401,34 +422,45 @@ export default function SupportTable() {
                 </Dialog>
             </div>
 
-            <Table className="w-full">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Product</TableHead>
-                        <TableHead>Process</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead></TableHead>
-                        <TableHead className="text-center">Comments</TableHead>
-                        <TableHead></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {tickets.map((ticket) => (
-                        <SupportRecord key={ticket.id} {...ticket} />
-                    ))}
-                </TableBody>
-            </Table>
+            {loading ? (
+                <div>
+                    <Skeleton className="w-[200px] h-[40px] mb-2 rounded" />
+                    <Skeleton className="w-full h-[40px] mb-2 rounded" />
+                    <Skeleton className="w-full h-[40px] mb-2 rounded" />
+                    <Skeleton className="w-full h-[40px] mb-2 rounded" />
+                </div>
+            ) : (
+                <div>
+                    <Table className="w-full">
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Customer</TableHead>
+                                <TableHead>Product</TableHead>
+                                <TableHead>Process</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead></TableHead>
+                                <TableHead className="text-center">Comments</TableHead>
+                                <TableHead></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tickets.map((ticket) => (
+                                <SupportRecord key={ticket.id} {...ticket} />
+                            ))}
+                        </TableBody>
+                    </Table>
 
-            <div className="flex justify-between items-center mt-4">
-                <Button variant="outline" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
-                    Previous
-                </Button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <Button variant="outline" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
-                    Next
-                </Button>
-            </div>
-        </div >
+                    <div className="flex justify-between items-center mt-4">
+                        <Button variant="outline" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                            Previous
+                        </Button>
+                        <span>Page {currentPage} of {totalPages}</span>
+                        <Button variant="outline" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
