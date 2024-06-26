@@ -170,6 +170,7 @@ async function generateNotifications() {
         include: {
             notifications: true,
             items: true,
+            comments: true,
         },
     });
 

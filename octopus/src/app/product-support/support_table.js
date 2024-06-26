@@ -48,8 +48,6 @@ export default function SupportTable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [notificationCount, setNotificationCount] = useState(0);
-    const [notifications, setNotifications] = useState([]);
 
 
     const ticketsPerPage = 20;
@@ -88,13 +86,8 @@ export default function SupportTable() {
 
     useEffect(() => {
         fetchData();
-        fetchNotifications();
     }, [includeResolved, searchQuery, currentPage]);
 
-    const fetchNotifications = async () => {
-        const notifications = await getNotifications();
-        setNotificationCount(notifications.length);
-    }
 
     useEffect(() => {
         if (!isModalOpen) {
@@ -228,21 +221,7 @@ export default function SupportTable() {
                 <div className="flex space-x-4">
                     <Button variant="outline" onClick={() => fetchData()}><RefreshCcw className='h-5 w-5' /></Button>
                     <div className="relative inline-block">
-                        <Drawer>
-                            <DrawerTrigger asChild>
-                                <Button variant="outline">
-                                    Notifications
-                                    {notificationCount > 0 && (
-                                        <Badge className="absolute top-1 right-1 transform translate-x-1/2 -translate-y-1/2 bg-red-600">
-                                            {notificationCount}
-                                        </Badge>
-                                    )}
-                                </Button>
-                            </DrawerTrigger>
-                            <DrawerContent>
-                                <NotificationTray notifications={notifications} dismissNotification={dismissNotification} />
-                            </DrawerContent>
-                        </Drawer>
+                        <NotificationTray />
                     </div>
                     <div className="flex items-center space-x-1 w-72">
                         <Input
