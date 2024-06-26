@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getSupportProducts, addSupportTicket } from './action';
+import { getSupportProducts, addSupportTicket, getNotifications } from './action';
 import SupportRecord from './support_record';
 import Link from 'next/link';
 import {
@@ -26,6 +26,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PlusCircle, RefreshCcw, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
+import { Badge } from '@/components/ui/badge';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import NotificationTray from './notifications_tray';
+
 
 export default function SupportTable() {
     const [tickets, setTickets] = useState([]);
@@ -35,6 +48,10 @@ export default function SupportTable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [notificationCount, setNotificationCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
+
+
     const ticketsPerPage = 20;
 
     const [newTicket, setNewTicket] = useState({
@@ -71,7 +88,13 @@ export default function SupportTable() {
 
     useEffect(() => {
         fetchData();
+        fetchNotifications();
     }, [includeResolved, searchQuery, currentPage]);
+
+    const fetchNotifications = async () => {
+        const notifications = await getNotifications();
+        setNotificationCount(notifications.length);
+    }
 
     useEffect(() => {
         if (!isModalOpen) {
@@ -204,13 +227,29 @@ export default function SupportTable() {
                 <h2 className="text-2xl font-semibold">Support Tickets</h2>
                 <div className="flex space-x-4">
                     <Button variant="outline" onClick={() => fetchData()}><RefreshCcw className='h-5 w-5' /></Button>
+                    <div className="relative inline-block">
+                        <Drawer>
+                            <DrawerTrigger asChild>
+                                <Button variant="outline">
+                                    Notifications
+                                    {notificationCount > 0 && (
+                                        <Badge className="absolute top-1 right-1 transform translate-x-1/2 -translate-y-1/2 bg-red-600">
+                                            {notificationCount}
+                                        </Badge>
+                                    )}
+                                </Button>
+                            </DrawerTrigger>
+                            <DrawerContent>
+                                <NotificationTray notifications={notifications} dismissNotification={dismissNotification} />
+                            </DrawerContent>
+                        </Drawer>
+                    </div>
                     <div className="flex items-center space-x-1 w-72">
                         <Input
                             placeholder="Search phone, name, product..."
                             onChange={(e) => debouncedSearch(e.target.value)}
                             className="w-full bg-white"
                         />
-
                     </div>
                     <div className="flex items-center space-x-1">
                         <Switch id="includeResolved" variant="outline" onCheckedChange={handleIncludeResolvedChange} checked={includeResolved} />

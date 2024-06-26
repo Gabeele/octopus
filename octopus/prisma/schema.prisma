@@ -8,40 +8,47 @@ generator client {
 }
 
 model ProductSupportTicket {
-  id              Int                  @id @default(autoincrement())
+  id              Int                    @id @default(autoincrement())
   customer_name   String
   dropoff_date    DateTime
   isWholesale     Boolean
-  phone_number    String?              // Optional field
-  items           ProductSupportItems[] @relation("TicketItems")
-  comments        SupportComments[]    @relation("TicketComments")
+  phone_number    String?                // Optional field
+  items           ProductSupportItems[]  @relation("TicketItems")
+  comments        SupportComments[]      @relation("TicketComments")
+  notifications   SupportProductNotifications[] @relation("TicketNotifications")
 }
 
 model ProductSupportItems {
-  id              Int                  @id @default(autoincrement())
+  id              Int                    @id @default(autoincrement())
   product         String
-  supportType     String               // Warranty Check, Recharge Check, Credit New
-  process         String               // Inspecting, Charging, Holding, Resolved
-  status          String?              // Not Holding Charge, Dead Cell, Broken, Worn, Good
-  age             String?              // Optional field
-  cca             Int?                 // Optional field
-  voltage         Float?               // Optional field
-  hasLoaner       Boolean              @default(false) // Optional field with default value
+  supportType     String                 // Warranty Check, Recharge Check, Credit New
+  process         String                 // Inspecting, Charging, Holding, Resolved
+  status          String?                // Not Holding Charge, Dead Cell, Broken, Worn, Good
+  age             String?                // Optional field
+  cca             Int?                   // Optional field
+  voltage         Float?                 // Optional field
+  hasLoaner       Boolean                @default(false) // Optional field with default value
   isResolved      Boolean
-  resolveDate     DateTime?            // Optional field
-  resolution      String?              // Credited, Warrantied, Returned, Scrapped, Refunded
+  resolveDate     DateTime?              // Optional field
+  resolution      String?                // Credited, Warrantied, Returned, Scrapped, Refunded
   ticketId        Int
-  ticket          ProductSupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade, name: "TicketItems")
+  ticket          ProductSupportTicket   @relation(fields: [ticketId], references: [id], onDelete: Cascade, name: "TicketItems")
 }
 
 model SupportComments {
-  id                Int                 @id @default(autoincrement())
+  id                Int                   @id @default(autoincrement())
   comment           String
   comment_date      DateTime
   ticketId          Int
-  ticket            ProductSupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade, name: "TicketComments")
+  ticket            ProductSupportTicket  @relation(fields: [ticketId], references: [id], onDelete: Cascade, name: "TicketComments")
 }
 
 model SupportProductNotifications {
-  
+  id                Int                   @id @default(autoincrement())
+  notificationType  String                // 14-day, 30-day
+  generatedDate     DateTime
+  isDismissed       Boolean               @default(false)
+  dismissedDate     DateTime?             // Optional field
+  ticketId          Int
+  ticket            ProductSupportTicket  @relation(fields: [ticketId], references: [id], onDelete: Cascade, name: "TicketNotifications")
 }
