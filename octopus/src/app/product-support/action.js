@@ -1,7 +1,7 @@
 'use server';
 import prisma from '@/lib/prisma';
 
-export async function getSupportProducts(includeResolved = false, searchQuery = '', page = 1, limit = 10) {
+export async function getSupportProducts(includeResolved = false, searchQuery = '', page = 1, limit = 25) {
     const whereClause = {
         OR: [
             { customer_name: { contains: searchQuery, mode: 'insensitive' } },
@@ -65,17 +65,24 @@ export async function updateProductProcess(id, process) {
     });
     return product;
 }
-
 export async function updateProductResolution(id, resolution) {
+    const data = {
+        resolution: resolution === 'null' ? null : resolution,
+        isResolved: resolution !== 'null',
+        resolveDate: resolution !== 'null' ? new Date() : null,
+        process: resolution !== 'null' ? 'Resolved' : undefined,
+    };
+
+    if (resolution === 'null') {
+        data.resolution = null;
+        data.process = 'inspecting';
+    }
+
     const product = await prisma.productSupportItems.update({
         where: { id },
-        data: {
-            resolution,
-            isResolved: true,
-            resolveDate: new Date(),
-            process: 'Resolved',
-        },
+        data,
     });
+
     return product;
 }
 

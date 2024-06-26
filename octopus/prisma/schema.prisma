@@ -41,3 +41,7 @@ model SupportComments {
   ticketId          Int
   ticket            ProductSupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade, name: "TicketComments")
 }
+
+model SupportProductNotifications {
+  
+}
