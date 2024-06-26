@@ -17,6 +17,6 @@ cd ./octopus
 npm install 
 # npm run build # Needs to run to make the directory before docker compose will create it and rerun 
 cd ..
-sudo docker compose up --build -d web
+sudo docker compose up --build -d --rm web
 
 echo "Deployment completed successfully."

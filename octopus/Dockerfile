@@ -14,7 +14,7 @@ RUN npm install
 COPY . ./
 
 # Run Prisma migrations
-RUN npx prisma migrate dev
+# RUN npx prisma migrate dev
 
 # Generate Prisma client
 RUN npx prisma generate

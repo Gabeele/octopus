@@ -139,7 +139,6 @@ export async function addSupportTicket(ticketDetails) {
 
 
 export async function getNotifications() {
-
     await generateNotifications();
 
     const notifications = await prisma.supportProductNotifications.findMany({
@@ -156,7 +155,8 @@ export async function getNotifications() {
     });
 
     return notifications;
-};
+}
+
 
 async function generateNotifications() {
     const unresolvedTickets = await prisma.productSupportTicket.findMany({
@@ -168,9 +168,9 @@ async function generateNotifications() {
             },
         },
         include: {
-            notifications: true,
             items: true,
             comments: true,
+            notifications: true,
         },
     });
 
