@@ -12,13 +12,13 @@ const Navigation = () => {
           <HomeIcon className="h-5 w-5" />
           <span>Dashboard</span>
         </Link>
-        {/* <Link
+        <Link
           className="flex items-center gap-2 hover:bg-gray-900 px-3 py-2 rounded-md"
-          href="/labour"
+          href="/time-card"
         >
           <UsersIcon className="h-5 w-5" />
-          <span>Labour</span>
-        </Link> */}
+          <span>Time Cards</span>
+        </Link>
         <Link
           className="flex items-center gap-2 hover:bg-gray-900 px-3 py-2 rounded-md"
           href="/product-support"
@@ -33,13 +33,14 @@ const Navigation = () => {
           <DollarSignIcon className="h-5 w-5" />
           <span>Cash Flow</span>
         </Link>
+  */}
         <Link
-          className="flex items-center gap-2 hover:bg-gray-900 px-3 py-2 rounded-md"
+          className="flex items-center gap-2 hover:bg-gray-900 px-3 py-2 rounded-md "
           href="/admin"
         >
           <AdminIcon className="h-5 w-5" />
           <span>Admin</span>
-        </Link> */}
+        </Link>
       </nav>
     </div>
   );
