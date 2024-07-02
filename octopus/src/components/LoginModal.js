@@ -36,8 +36,11 @@ function LoginModal({ getUsers, validateUser, onLoginSuccess }) {
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger asChild><div className='flex flex-col items-center'>
+
+                <h1>Click to view time schedule information</h1>
                 <Button variant="outline">Sign In</Button>
+            </div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

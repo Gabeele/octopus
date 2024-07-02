@@ -68,5 +68,7 @@ model TimeCard {
   clockIn    DateTime
   clockOut   DateTime?
   userId     Int
+  isPayed    Boolean
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserTimeCards")
+
 }
