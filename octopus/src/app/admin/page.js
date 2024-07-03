@@ -5,11 +5,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import TimeCards from "./Timecards"
 
 export default function AdminPanel() {
-    const [activeTab, setActiveTab] = useState("timeDashboard")
+    const [activeTab, setActiveTab] = useState("dashboard")
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
-            <Tabs defaultValue="timeDashboard" value={activeTab} onValueChange={setActiveTab} className="border-b">
+        <div className="">
+
+            <Tabs defaultValue="timeDashboard" value={activeTab} onValueChange={setActiveTab} className="">
                 <TabsList className="flex">
                     <TabsTrigger value="dashboard"> Dashboard</TabsTrigger>
                     <TabsTrigger value="timecards">Time Cards</TabsTrigger>

@@ -119,13 +119,6 @@ function TimeCardPage() {
         ],
     };
 
-    const getGreeting = () => {
-        const hour = clock.getHours();
-        if (hour < 12) return "Good morning";
-        if (hour < 18) return "Good afternoon";
-        if (hour < 22) return "Good evening";
-        return greetings[Math.floor(Math.random() * greetings.length)];
-    };
 
     return (
         <div className="grid gap-8 p-6 sm:p-10">
@@ -134,7 +127,7 @@ function TimeCardPage() {
             ) : authenticatedUser ? (
                 <div className="grid gap-4">
                     <div className="flex justify-between items-center px-1">
-                        <h1 className='text-2xl'>{getGreeting()}, {authenticatedUser.firstName}!</h1>
+                        <h1 className='text-2xl'>Hey there, {authenticatedUser.firstName}!</h1>
                         <Button variant="outline" className="bg-red-600 text-white" onClick={handleLogout}>Logout</Button>
                     </div>
                     <Card>
@@ -146,7 +139,7 @@ function TimeCardPage() {
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div className="flex flex-col items-center gap-2 p-4 bg-muted rounded-lg">
                                     <div className="text-4xl font-bold">
-                                        <span className="text-primary">{clock.getHours()}</span>:<span className="text-primary">{clock.getMinutes()}</span>
+                                        <span className="text-primary">{clock.getHours().toString().padStart(2, '0')}</span>:<span className="text-primary">{clock.getMinutes().toString().padStart(2, '0')}</span>
                                     </div>
                                     <div className="text-sm text-muted-foreground">Current Time</div>
                                 </div>

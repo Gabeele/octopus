@@ -67,3 +67,16 @@ export async function punchOut(userId) {
         throw new Error('No active time card found for the user');
     }
 }
+
+
+export async function markAsPaid(timeCardIds) {
+    const updatedTimeCards = await prisma.timeCard.updateMany({
+        where: {
+            id: { in: timeCardIds },
+        },
+        data: {
+            isPaid: true,
+        },
+    });
+    return updatedTimeCards;
+}
