@@ -80,3 +80,14 @@ export async function markAsPaid(timeCardIds) {
     });
     return updatedTimeCards;
 }
+
+export async function updateTimeCard(timeCardId, clockIn, clockOut) {
+    const updatedTimeCard = await prisma.timeCard.update({
+        where: { id: timeCardId },
+        data: {
+            clockIn,
+            clockOut,
+        },
+    });
+    return updatedTimeCard;
+}
