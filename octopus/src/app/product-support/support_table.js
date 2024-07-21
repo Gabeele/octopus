@@ -38,6 +38,7 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import NotificationTray from './notifications_tray';
+import { useRouter } from 'next/navigation';
 
 
 export default function SupportTable() {
@@ -49,6 +50,7 @@ export default function SupportTable() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    const router = useRouter();
 
     const ticketsPerPage = 20;
 
@@ -174,7 +176,7 @@ export default function SupportTable() {
             ...(newTicket.comment && { comment: newTicket.comment })
         };
 
-        await addSupportTicket(finalTicket);
+        const createTicket = await addSupportTicket(finalTicket);
 
         fetchData();
         setIsModalOpen(false);
@@ -189,6 +191,10 @@ export default function SupportTable() {
             comment: '',
             products: [{ product: '', supportType: '', age: '', cca: '', voltage: '' }],
         });
+
+        // Navigate to the ticket page using next link
+        router.push(`/product-support/${createTicket.id}`);
+
     };
 
     const isFormValid = () => {
