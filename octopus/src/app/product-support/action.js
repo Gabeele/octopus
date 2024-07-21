@@ -1,6 +1,15 @@
 'use server';
 import prisma from '@/lib/prisma';
 
+function setDateToNoon(dateString) {
+
+    const date = new Date(dateString);
+
+    date.setUTCHours(12, 0, 0, 0);
+
+    return date;
+}
+
 export async function getSupportProducts(includeResolved = false, searchQuery = '', page = 1, limit = 25) {
     const whereClause = {
         OR: [
@@ -69,7 +78,7 @@ export async function updateProductResolution(id, resolution) {
     const data = {
         resolution: resolution === 'null' ? null : resolution,
         isResolved: resolution !== 'null',
-        resolveDate: resolution !== 'null' ? new Date() : null,
+        resolveDate: resolution !== 'null' ? new Date().setHours(12, 0, 0, 0) : null,
         process: resolution !== 'null' ? 'Resolved' : undefined,
     };
 
@@ -90,12 +99,11 @@ export async function addComment(ticketId, comment) {
     return await prisma.supportComments.create({
         data: {
             comment,
-            comment_date: new Date(),
+            comment_date: new Date().setHours(12, 0, 0, 0),
             ticketId
         }
     });
 }
-
 
 export async function addSupportTicket(ticketDetails) {
     const { customer_name, dropoff_date, isWholesale, phone_number, products, comment } = ticketDetails;
@@ -103,7 +111,7 @@ export async function addSupportTicket(ticketDetails) {
     const createdTicket = await prisma.productSupportTicket.create({
         data: {
             customer_name,
-            dropoff_date: new Date(dropoff_date),
+            dropoff_date: setDateToNoon(dropoff_date),
             isWholesale: isWholesale || false,
             phone_number,
             items: {
@@ -123,7 +131,7 @@ export async function addSupportTicket(ticketDetails) {
                 comments: {
                     create: {
                         comment,
-                        comment_date: new Date()
+                        comment_date: new Date().setHours(12, 0, 0, 0)
                     }
                 }
             })
@@ -136,7 +144,6 @@ export async function addSupportTicket(ticketDetails) {
 
     return createdTicket;
 }
-
 
 export async function getNotifications() {
     await generateNotifications();
@@ -157,7 +164,6 @@ export async function getNotifications() {
     return notifications;
 }
 
-
 async function generateNotifications() {
     const unresolvedTickets = await prisma.productSupportTicket.findMany({
         where: {
@@ -175,6 +181,7 @@ async function generateNotifications() {
     });
 
     const currentDate = new Date();
+    currentDate.setHours(12, 0, 0, 0);
 
     const notificationsToCreate = [];
     const notificationsToUpdate = [];
@@ -240,13 +247,12 @@ async function generateNotifications() {
     }
 }
 
-
 export async function dismissNotification(notificationId) {
     await prisma.supportProductNotifications.update({
         where: { id: notificationId },
         data: {
             isDismissed: true,
-            dismissedDate: new Date(),
+            dismissedDate: new Date().setHours(12, 0, 0, 0),
         },
     });
 }

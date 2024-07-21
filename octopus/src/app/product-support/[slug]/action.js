@@ -1,6 +1,12 @@
 'use server'
 import prisma from '@/lib/prisma';
 
+function setDateToNoon(dateString) {
+    const date = new Date(dateString);
+    date.setUTCHours(12, 0, 0, 0);
+    return date;
+}
+
 export async function getProductSupportTicket(id) {
     const ticket = await prisma.productSupportTicket.findUnique({
         where: { id },
@@ -32,11 +38,12 @@ export async function updateProductProcess(id, process) {
     });
     return product;
 }
+
 export async function updateProductResolution(id, resolution) {
     const data = {
         resolution: resolution === 'null' ? null : resolution,
         isResolved: resolution !== 'null',
-        resolveDate: resolution !== 'null' ? new Date() : null,
+        resolveDate: resolution !== 'null' ? setDateToNoon(new Date()) : null,
         process: resolution !== 'null' ? 'Resolved' : undefined,
     };
 
@@ -57,7 +64,7 @@ export async function addComment(ticketId, comment) {
     return await prisma.supportComments.create({
         data: {
             comment,
-            comment_date: new Date(),
+            comment_date: setDateToNoon(new Date()),
             ticketId
         }
     });
@@ -92,7 +99,7 @@ export async function updateProductDetails(id, updatedData) {
             customer_name: updatedData.customer_name,
             phone_number: updatedData.phone_number,
             isWholesale: updatedData.isWholesale,
-            dropoff_date: new Date(updatedData.dropoff_date),
+            dropoff_date: setDateToNoon(updatedData.dropoff_date),
         },
     });
 }
