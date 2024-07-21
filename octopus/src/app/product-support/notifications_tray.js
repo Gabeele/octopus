@@ -40,7 +40,7 @@ const NotificationTray = () => {
                     )}
                 </Button>
             </DrawerTrigger>
-            <DrawerContent className="w-1/2 m-auto h-1/2">
+            <DrawerContent className="w-1/2 m-auto h-3/4">
                 <DrawerHeader>
                     <DrawerTitle>Notifications</DrawerTitle>
                     <DrawerDescription>Check your pending notifications</DrawerDescription>

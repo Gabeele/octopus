@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, RefreshCcw, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import {
     Drawer,
@@ -40,7 +40,6 @@ import {
 import NotificationTray from './notifications_tray';
 import { useRouter } from 'next/navigation';
 
-
 export default function SupportTable() {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,6 +48,7 @@ export default function SupportTable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [returnType, setReturnType] = useState('All'); // Default to "All" return types
 
     const router = useRouter();
 
@@ -80,7 +80,7 @@ export default function SupportTable() {
 
     const fetchData = async () => {
         setLoading(true);
-        const { tickets, total } = await getSupportProducts(includeResolved, searchQuery, currentPage, ticketsPerPage);
+        const { tickets, total } = await getSupportProducts(includeResolved, searchQuery, currentPage, ticketsPerPage, returnType);
         setTickets(tickets);
         setTotalPages(Math.ceil(total / ticketsPerPage));
         setLoading(false);
@@ -88,7 +88,7 @@ export default function SupportTable() {
 
     useEffect(() => {
         fetchData();
-    }, [includeResolved, searchQuery, currentPage]);
+    }, [includeResolved, searchQuery, currentPage, returnType]);
 
     useEffect(() => {
         if (!isModalOpen) {
@@ -138,7 +138,7 @@ export default function SupportTable() {
     };
 
     const handlePhoneChange = (field, value, nextFieldRef) => {
-        if (!/^\d*$/.test(value)) return;  // Allow only digits
+        if (!/^\d*$/.test(value)) return;
         if (field === 'phoneLine' && value.length > 4) return;
         if (value.length <= 3 || (field === 'phoneLine' && value.length <= 4)) {
             setNewTicket((prevTicket) => ({
@@ -191,9 +191,7 @@ export default function SupportTable() {
             products: [{ product: '', supportType: '', age: '', cca: '', voltage: '' }],
         });
 
-        // Navigate to the ticket page using next link
         router.push(`/product-support/${createTicket.id}`);
-
     };
 
     const isFormValid = () => {
@@ -217,19 +215,15 @@ export default function SupportTable() {
 
     const debouncedSearch = debounce((value) => {
         setSearchQuery(value);
-        setCurrentPage(1);  // Reset to the first page whenever the search query changes
-    }, 300);
+        setCurrentPage(1);
+    }, 200);
 
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold">Support Tickets</h2>
-                <div className="flex space-x-4">
-                    <Button variant="outline" onClick={() => fetchData()}><RefreshCcw className='h-5 w-5' /></Button>
-                    <div className="relative inline-block">
-                        <NotificationTray />
-                    </div>
-                    <div className="flex items-center space-x-1 w-72">
+                <h2 className="text-2xl font-semibold w-1/4">Support Tickets</h2>
+                <div className="flex space-x-4 w-3/4">
+                    <div className="flex items-center space-x-1 w-1/2">
                         <Input
                             placeholder="Search phone, name, product..."
                             onChange={(e) => debouncedSearch(e.target.value)}
@@ -239,6 +233,25 @@ export default function SupportTable() {
                     <div className="flex items-center space-x-1">
                         <Switch id="includeResolved" variant="outline" onCheckedChange={handleIncludeResolvedChange} checked={includeResolved} />
                         <Label htmlFor="includeResolved">Show Resolved</Label>
+                    </div>
+                    <Select
+                        id="returnType"
+                        value={returnType}
+                        onValueChange={(value) => setReturnType(value)}
+                        c
+                    >
+                        <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Filter by Return Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="All">All Types</SelectItem>
+                            <SelectItem value="Warranty Check">Warranty Check</SelectItem>
+                            <SelectItem value="Recharge Check">Recharge Check</SelectItem>
+                            <SelectItem value="Credit New">Credit New</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <div className="relative inline-block">
+                        <NotificationTray />
                     </div>
                     <Button variant="" onClick={() => setIsModalOpen(true)}>
                         <PlusCircle className='h-5 w-5 mr-2' /> Add Ticket
@@ -279,7 +292,7 @@ export default function SupportTable() {
                                                 <span>)</span>
                                                 <Input
                                                     id="phonePrefix"
-                                                    className="w-16 text-center"
+                                                    className="w-20 text-center"
                                                     placeholder="Prefix"
                                                     value={newTicket.phonePrefix}
                                                     onChange={(e) => handlePhoneChange('phonePrefix', e.target.value, lineRef)}
@@ -289,7 +302,7 @@ export default function SupportTable() {
                                                 <span>-</span>
                                                 <Input
                                                     id="phoneLine"
-                                                    className="w-24 text-center"
+                                                    className="w-16 text-center"
                                                     placeholder="Line"
                                                     value={newTicket.phoneLine}
                                                     onChange={(e) => handlePhoneChange('phoneLine', e.target.value)}

@@ -57,6 +57,22 @@ export async function updateProductResolution(id, resolution) {
         data,
     });
 
+    // Check if all items in the ticket are resolved
+    const ticketItems = await prisma.productSupportItems.findMany({
+        where: { ticketId: product.ticketId },
+    });
+
+    const allResolved = ticketItems.every(item => item.isResolved);
+
+    if (allResolved) {
+        // Delete associated notifications when all items in the ticket are resolved
+        await prisma.supportProductNotifications.deleteMany({
+            where: {
+                ticketId: product.ticketId
+            }
+        });
+    }
+
     return product;
 }
 
