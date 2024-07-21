@@ -90,7 +90,6 @@ export default function SupportTable() {
         fetchData();
     }, [includeResolved, searchQuery, currentPage]);
 
-
     useEffect(() => {
         if (!isModalOpen) {
             setNewTicket({
@@ -218,6 +217,7 @@ export default function SupportTable() {
 
     const debouncedSearch = debounce((value) => {
         setSearchQuery(value);
+        setCurrentPage(1);  // Reset to the first page whenever the search query changes
     }, 300);
 
     return (
