@@ -129,7 +129,7 @@ export async function addComment(ticketId, comment) {
     return await prisma.supportComments.create({
         data: {
             comment,
-            comment_date: new Date().setHours(12, 0, 0, 0),
+            comment_date: setDateToNoon(new Date()),
             ticketId
         }
     });
