@@ -1,9 +1,6 @@
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
-import Image from "next/image";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Topbar } from "@/components/Topbar";
 
 export const metadata = {
   title: "Octopus | Battery Wholesale Utility App",
@@ -11,11 +8,7 @@ export const metadata = {
   keywords: "battery, utility, wholesale, inventory, warranty, schedule, app",
 };
 
-const version = process.env.VERSION;
-
-export default function RootLayout({
-  children,
-}) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
@@ -23,42 +16,20 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
 
-      <body className="bg-gray-950">
-        <div className="flex min-h-screen h-full w-full flex-col bg-gray-950">
-          <header className="bg-gray-950 text-gray-50 px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Image src='logo.svg' width="24" height="24" />
-              <span className="text-lg font-semibold">Octopus <span className="text-xs">{version}</span></span>
-            </div>
-            <div className="text-sm text-gray-400" />
-          </header>
-          <div className="flex h-full">
+      <body className="flex flex-col min-h-screen">
+        <div className="w-full sticky top-0 z-10">
+          <Topbar />
+        </div>
+
+        <div className="flex flex-1 min-h-screen overflow-hidden">
+          <div className="max-w-64 bg-gray-800 flex-shrink-0">
             <Navigation />
-            <div className="flex-1 bg-gray-100 dark:bg-gray-950 p-6 min-h-screen">
-              {children}
-            </div>
+          </div>
+          <div className="flex-1 min-h-full p-5">
+            {children}
           </div>
         </div>
       </body>
     </html>
-  );
-}
-
-function MountainIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-    </svg>
   );
 }
