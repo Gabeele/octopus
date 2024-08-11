@@ -1,6 +1,8 @@
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import { Topbar } from "@/components/Topbar";
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "Octopus | Battery Wholesale Utility App",
@@ -25,8 +27,9 @@ export default function RootLayout({ children }) {
           <div className="max-w-64 bg-gray-800 flex-shrink-0">
             <Navigation />
           </div>
-          <div className="flex-1 min-h-full p-5">
-            {children}
+          <div className="flex-1 min-h-full p-5 md:ml-64 sm:ml-20">            {children}
+            <Toaster />
+            
           </div>
         </div>
       </body>

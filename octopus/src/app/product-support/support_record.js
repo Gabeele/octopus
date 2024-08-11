@@ -14,7 +14,7 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { Input } from '@/components/ui/input';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -27,18 +27,20 @@ import {
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { ReceiptText, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace, Recycle, PackageOpen } from "lucide-react";
+import { EllipsisVertical, MessageSquareDiff, PiggyBank, HandCoins, Trash2, Undo2, Replace, Recycle, PackageOpen,  } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useToast } from '@/components/ui/use-toast';
 
 export default function SupportRecord(initialProduct) {
     const [newComment, setNewComment] = useState('');
     const [record, setRecord] = useState(initialProduct);
-    const closeDialogRef = useRef(null); // Reference for DialogClose
+    const closeDialogRef = useRef(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         fetchProduct(record.id);
@@ -50,26 +52,74 @@ export default function SupportRecord(initialProduct) {
     };
 
     const handleStatusChange = async (newStatus, itemId) => {
-        await updateProductStatus(itemId, newStatus);
-        fetchProduct(record.id);
+        try {
+            await updateProductStatus(itemId, newStatus);
+            fetchProduct(record.id);
+            toast({
+                title: "Status Updated!",
+                description: "Your battery is one step closer to greatness!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "Your battery is still confused about its status.",
+            });
+        }
     };
 
     const handleProcessChange = async (newProcess, itemId) => {
-        await updateProductProcess(itemId, newProcess);
-        fetchProduct(record.id);
+        try {
+            await updateProductProcess(itemId, newProcess);
+            fetchProduct(record.id);
+            toast({
+                title: "Process Updated!",
+                description: "The wheels are turning smoothly now!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "The process is stuck in a rut.",
+            });
+        }
     };
 
     const handleResolutionChange = async (resolution, itemId) => {
-        await updateProductResolution(itemId, resolution);
-        fetchProduct(record.id);
+        try {
+            await updateProductResolution(itemId, resolution);
+            fetchProduct(record.id);
+            toast({
+                title: "Resolution Updated!",
+                description: "Another mystery solved!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "Resolution is still a puzzle.",
+            });
+        }
     };
 
     const handleAddComment = async () => {
         if (newComment.trim() === '') return;
 
-        await addComment(record.id, newComment);
-        setNewComment('');
-        fetchProduct(record.id);
+        try {
+            await addComment(record.id, newComment);
+            setNewComment('');
+            fetchProduct(record.id);
+            toast({
+                title: "Comment Added!",
+                description: "Your words of wisdom are now immortalized!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "Your comment is lost in the void.",
+            });
+        }
 
         // Close the dialog programmatically
         if (closeDialogRef.current) {
@@ -77,17 +127,15 @@ export default function SupportRecord(initialProduct) {
         }
     };
 
-    const truncateText = (text, maxLength) => {
-        if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength) + '...';
-    };
 
-    const mostRecentComment = record.comments.length > 0
-        ? record.comments[record.comments.length - 1].comment
-        : 'No comments';
+    const hiddenClass = useMemo(() => {
+        return record.items.every(item => item.isResolved) ? 'hidden' : '';
+    }, [record.items]);
+
+
 
     return (
-        <TableRow key={record.id} className="border-gray-400 ">
+        <TableRow key={record.id} className={`border-gray-400 ${hiddenClass}`}>
             <TableCell className="max-w-xs"><div><span className='font-bold'>{record.customer_name}</span>{record.phone_number ? ', ' + record.phone_number : ' '}</div><div>
                 {format(new Date(record.dropoff_date), 'PP')}, {record.isWholesale ? 'Wholesale' : 'Walk-in'}</div></TableCell>
 
@@ -225,10 +273,11 @@ export default function SupportRecord(initialProduct) {
             <TableCell className="max-w-xs text-right">
 
                 <Link href={`/product-support/${record.id}`}>
-                    <Button variant="outline" className=""><ReceiptText className='h-5 w-5' />
+                    <Button variant="outline" className=""><EllipsisVertical className='h-5 w-5' />
                     </Button>
                 </Link>
             </TableCell>
         </TableRow>
     );
 }
+

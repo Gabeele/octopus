@@ -18,7 +18,7 @@ const Navigation = () => {
   ];
 
   return (
-    <div className="flex flex-col bg-gray-950 text-gray-50 p-4 gap-4 h-full md:w-64">
+    <div className="flex flex-col bg-gray-950 text-gray-50 p-4 gap-4  h-screen md:w-64 fixed z-10 shadow-md">
       <nav className="flex flex-col gap-2">
         {items.map((item, index) => (
           <Link

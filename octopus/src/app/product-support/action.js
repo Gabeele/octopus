@@ -195,6 +195,18 @@ export async function getNotifications() {
 }
 
 async function generateNotifications() {
+    // Gets the local time
+    const serverTime = new Date();
+    const localOffset = serverTime.getTimezoneOffset();
+    const localTime = new Date(serverTime.getTime() - localOffset * 60000);
+
+    // Calculate the date 15 days ago and 30 days ago
+    const fifteenDaysAgo = new Date(localTime);
+    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
+
+    const thirtyDaysAgo = new Date(localTime);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
     const unresolvedTickets = await prisma.productSupportTicket.findMany({
         where: {
             items: {
@@ -210,53 +222,74 @@ async function generateNotifications() {
         },
     });
 
-    const currentDate = new Date();
-    currentDate.setHours(12, 0, 0, 0);
-
-    const notificationsToCreate = [];
-
-    unresolvedTickets.forEach(ticket => {
-        const daysSinceDropoff = Math.floor(
-            (currentDate.getTime() - new Date(ticket.dropoff_date).getTime()) / (1000 * 60 * 60 * 24)
-        );
-
-        const existing14DayNotification = ticket.notifications.find(
-            n => n.notificationType === '14-day'
-        );
-        const existing30DayNotification = ticket.notifications.find(
-            n => n.notificationType === '30-day'
-        );
-
-        if (daysSinceDropoff >= 14 && daysSinceDropoff < 30) {
-            if (!existing14DayNotification) {
-                notificationsToCreate.push({
-                    notificationType: '14-day',
-                    generatedDate: currentDate,
-                    isDismissed: false,
-                    ticketId: ticket.id,
-                });
-            }
-        }
-
-        if (daysSinceDropoff >= 30) {
-            if (!existing30DayNotification || (existing30DayNotification && existing30DayNotification.isDismissed)) {
-                notificationsToCreate.push({
-                    notificationType: '30-day',
-                    generatedDate: currentDate,
-                    isDismissed: false,
-                    ticketId: ticket.id,
-                });
-            }
-        }
+    // Filter tickets between 15 and 30 days
+    const between15And30 = unresolvedTickets.filter((ticket) => {
+        const ticketDate = new Date(ticket.dropoff_date);
+        return ticketDate < fifteenDaysAgo && ticketDate >= thirtyDaysAgo;
     });
 
-    if (notificationsToCreate.length > 0) {
-        await prisma.supportProductNotifications.createMany({
-            data: notificationsToCreate,
-            skipDuplicates: true,
-        });
+    // Filter tickets older than 30 days
+    const after30Days = unresolvedTickets.filter((ticket) => {
+        const ticketDate = new Date(ticket.dropoff_date);
+        return ticketDate < thirtyDaysAgo;
+    });
+
+    // Generate notifications for tickets between 15 and 30 days
+    for (const ticket of between15And30) {
+        const existingNotification = ticket.notifications.find(
+            (notification) => notification.notificationType === "14-day"
+        );
+
+        if (!existingNotification) {
+            await prisma.supportProductNotifications.create({
+                data: {
+                    notificationType: "14-day",
+                    generatedDate: localTime,
+                    ticketId: ticket.id,
+                    isDismissed: false, // These can be dismissed
+                },
+            });
+        }
+    }
+
+    // Generate notifications for tickets older than 30 days
+    for (const ticket of after30Days) {
+        const existingNotification = ticket.notifications.find(
+            (notification) => notification.notificationType === "30-day"
+        );
+
+        if (!existingNotification) {
+            await prisma.supportProductNotifications.create({
+                data: {
+                    notificationType: "30-day",
+                    generatedDate: localTime,
+                    ticketId: ticket.id,
+                    isDismissed: false, // These cannot be dismissed
+                },
+            });
+        }
+    }
+
+    // Handle dismissals if all items are resolved
+    for (const ticket of unresolvedTickets) {
+        const allResolved = ticket.items.every((item) => item.isResolved);
+        if (allResolved) {
+            await prisma.supportProductNotifications.updateMany({
+                where: {
+                    ticketId: ticket.id,
+                },
+                data: {
+                    isDismissed: true,
+                    dismissedDate: localTime,
+                },
+            });
+        }
     }
 }
+
+// Call the function
+generateNotifications().catch(console.error);
+
 
 export async function dismissNotification(notificationId) {
     await prisma.supportProductNotifications.update({

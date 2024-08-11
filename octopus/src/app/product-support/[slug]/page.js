@@ -24,7 +24,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
+import { Skeleton } from '@/components/ui/skeleton'; 
+import { useToast } from '@/components/ui/use-toast'; 
 
 export default function ProductSupportDetails() {
     const id = parseInt(usePathname().split('/').pop());
@@ -32,6 +33,7 @@ export default function ProductSupportDetails() {
     const [newComment, setNewComment] = useState('');
     const router = useRouter();
     const printRef = useRef();
+    const { toast } = useToast();
 
     useEffect(() => {
         if (id) {
@@ -46,30 +48,90 @@ export default function ProductSupportDetails() {
     }
 
     const handleStatusChange = async (newStatus, itemId) => {
-        await updateProductStatus(itemId, newStatus);
-        fetchProduct(id);
+        try {
+            await updateProductStatus(itemId, newStatus);
+            fetchProduct(id);
+            toast({
+                title: "Status Updated!",
+                description: "The battery is feeling good about its new status!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "The status update hit a snag.",
+            });
+        }
     };
 
     const handleProcessChange = async (newProcess, itemId) => {
-        await updateProductProcess(itemId, newProcess);
-        fetchProduct(id);
+        try {
+            await updateProductProcess(itemId, newProcess);
+            fetchProduct(id);
+            toast({
+                title: "Process Updated!",
+                description: "The process is moving along smoothly!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "The process got stuck in traffic.",
+            });
+        }
     };
 
     const handleResolutionChange = async (resolution, itemId) => {
-        await updateProductResolution(itemId, resolution);
-        fetchProduct(id);
+        try {
+            await updateProductResolution(itemId, resolution);
+            fetchProduct(id);
+            toast({
+                title: "Resolution Updated!",
+                description: "Another mystery has been resolved!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "The resolution is still a mystery.",
+            });
+        }
     };
 
     const handleCommentSubmit = async () => {
         if (newComment.trim() === '') return;
-        await addComment(id, newComment);
-        setNewComment('');
-        fetchProduct(id);
+        try {
+            await addComment(id, newComment);
+            setNewComment('');
+            fetchProduct(id);
+            toast({
+                title: "Comment Added!",
+                description: "Your thoughts have been captured!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "Your comment got lost in the ether.",
+            });
+        }
     };
 
     const handleHasLoanerChange = async (itemId) => {
-        await toggleLoaner(itemId);
-        fetchProduct(id);
+        try {
+            await toggleLoaner(itemId);
+            fetchProduct(id);
+            toast({
+                title: "Loaner Status Updated!",
+                description: "Loaner status toggled successfully!",
+            });
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "The loaner status toggle failed.",
+            });
+        }
     };
 
     const navigateToProductSupport = () => {
@@ -77,8 +139,20 @@ export default function ProductSupportDetails() {
     }
 
     const handelDelete = async () => {
-        await deleteProductSupportTicket(id);
-        navigateToProductSupport();
+        try {
+            await deleteProductSupportTicket(id);
+            toast({
+                title: "Product Support Ticket Deleted!",
+                description: "The ticket has been successfully deleted!",
+            });
+            navigateToProductSupport();
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "The ticket could not be deleted.",
+            });
+        }
     }
 
     const handlePrint = () => {
@@ -127,8 +201,6 @@ export default function ProductSupportDetails() {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-
-
                 </div>
             </div>
 

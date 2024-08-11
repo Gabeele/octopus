@@ -7,11 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { getNotifications, dismissNotification } from './action';
 import Link from 'next/link';
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useToast } from '@/components/ui/use-toast';
 
 
 const NotificationTray = () => {
     const [notifications, setNotifications] = React.useState([]);
     const [notificationCount, setNotificationCount] = React.useState(0);
+    const {toast} = useToast();
 
     const fetchNotifications = async () => {
         const fetchedNotifications = await getNotifications();
@@ -24,8 +26,21 @@ const NotificationTray = () => {
     }, []);
 
     const handleDismissNotification = async (notificationId) => {
+        try{
         await dismissNotification(notificationId);
         fetchNotifications();
+        toast({
+            title: "That that out of here!",
+            description: "Your notification was dismissed, keep it up!",
+          })
+        }
+        catch (e){
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "There was a problem with your dismissing the notification.",
+              })
+        }
     };
 
     return (
