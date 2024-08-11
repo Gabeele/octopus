@@ -75,6 +75,11 @@
   }
 }
 
+.min-h-full-minus-24px {
+  min-height: calc(100% - 24px);
+}
+
+
 .fadeIn {
   opacity: 0;
   animation: fadeInAnimation 1s ease-in forwards;

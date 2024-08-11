@@ -23,11 +23,12 @@ export default function RootLayout({ children }) {
           <Topbar />
         </div>
 
-        <div className="flex flex-1 min-h-screen overflow-hidden">
+        <div className="flex flex-1 overflow-hidden">
           <div className="max-w-64 bg-gray-800 flex-shrink-0">
             <Navigation />
           </div>
-          <div className="flex-1 min-h-full p-5 md:ml-64 sm:ml-20">            {children}
+          <div className="flex-1 p-5 md:ml-64 sm:ml-20" >            
+            {children}
             <Toaster />
             
           </div>
